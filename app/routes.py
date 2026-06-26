@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, session, flash
 from app.models import db, Product, Movement, User, ActivityLog, ProductSerial
 from openpyxl import Workbook
-from flask import send_file
+from flask import send_file, jsonify
 from sqlalchemy import func
 import io
 import os
@@ -1342,7 +1342,6 @@ def delete_serial(id):
     return redirect(f"/serials/{product_id}")
 
 
-from flask import jsonify
 
 @bp.route("/api/products")
 def api_products():
@@ -1374,3 +1373,29 @@ def api_products():
         })
 
     return jsonify(result)
+
+@bp.route("/api/serials/check")
+def api_check_serial():
+
+    if "user" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Unauthorized"
+        }), 401
+
+    serial = request.args.get("serial", "").strip()
+
+    if not serial:
+        return jsonify({
+            "success": False,
+            "exists": False
+        })
+
+    exists = ProductSerial.query.filter_by(
+        serial_number=serial
+    ).first()
+
+    return jsonify({
+        "success": True,
+        "exists": exists is not None
+    })

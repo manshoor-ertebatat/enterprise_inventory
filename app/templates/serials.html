@@ -17,7 +17,11 @@
 
 <hr>
 
-<form method="POST" action="/serials/add">
+<form
+id="serial_form"
+method="POST"
+action="/serials/add"
+autocomplete="off">
 
 <input
 type="hidden"
@@ -29,16 +33,33 @@ value="{{ product.id }}">
 <div class="col-md-8">
 
 <input
+id="serial_number"
 name="serial_number"
-class="form-control"
-placeholder="شماره سریال">
+class="form-control form-control-lg"
+placeholder="📷 شماره سریال را اسکن یا تایپ کنید"
+autocomplete="off"
+spellcheck="false"
+enterkeyhint="done"
+autofocus
+required>
+
+<div class="form-text mt-2">
+
+اسکن کنید و Enter بزنید.
+
+</div>
 
 </div>
 
 <div class="col-md-4">
 
-<button class="btn btn-success w-100">
-ثبت سریال
+<button
+id="save_serial"
+class="btn btn-success w-100"
+type="button">
+
+💾 ثبت سریال
+
 </button>
 
 </div>
@@ -46,6 +67,15 @@ placeholder="شماره سریال">
 </div>
 
 </form>
+
+<div
+id="serial_counter"
+class="alert alert-info mt-3">
+
+تعداد سریال‌های ثبت‌شده:
+<b>{{ serials|length }}</b>
+
+</div>
 
 <hr>
 
@@ -165,6 +195,30 @@ onclick="return confirm('آیا از حذف این سریال مطمئن هست�
 <a href="/dashboard" class="btn btn-secondary">
 بازگشت
 </a>
+
+<script>
+
+document.addEventListener("DOMContentLoaded",function(){
+
+const serial=document.getElementById("serial_number");
+
+serial.focus();
+
+serial.addEventListener("keydown",function(e){
+
+if(e.key==="Enter"){
+
+e.preventDefault();
+
+this.form.submit();
+
+}
+
+});
+
+});
+
+</script>
 
 </body>
 </html>
