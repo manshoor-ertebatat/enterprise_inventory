@@ -327,6 +327,63 @@ select.appendChild(op.cloneNode(true));
 
 }
 
+search.addEventListener("keydown", function(e){
+
+    if(e.key==="Enter"){
+
+        e.preventDefault();
+
+        if(select.options.length){
+
+            select.selectedIndex=0;
+
+            document.getElementById("qty").focus();
+
+        }
+
+    }
+
+});
+
+select.addEventListener("change", function(){
+
+    document.getElementById("qty").focus();
+
+});
+
+});
+
+const fields=[
+document.getElementById("qty"),
+document.getElementById("receiver_name"),
+document.getElementById("customer_name"),
+document.getElementById("project_name"),
+document.getElementById("description"),
+document.getElementById("move_type")
+];
+
+fields.forEach(function(field,index){
+
+    field.addEventListener("keydown",function(e){
+
+        if(e.key==="Enter"){
+
+            e.preventDefault();
+
+            if(index<fields.length-1){
+
+                fields[index+1].focus();
+
+            }else{
+
+                document.querySelector('form[action="/move"]').submit();
+
+            }
+
+        }
+
+    });
+
 });
 
 if(select.options.length>0){
@@ -349,12 +406,14 @@ class="form-control"
 type="number"
 min="1"
 name="qty"
+id="qty"
 placeholder="تعداد">
 </div>
 
 <div class="mb-2">
 <input
 class="form-control"
+id="receiver_name"
 name="receiver_name"
 placeholder="نام تحویل گیرنده">
 </div>
@@ -362,6 +421,7 @@ placeholder="نام تحویل گیرنده">
 <div class="mb-2">
 <input
 class="form-control"
+id="customer_name"
 name="customer_name"
 placeholder="مشتری مقصد">
 </div>
@@ -369,6 +429,7 @@ placeholder="مشتری مقصد">
 <div class="mb-2">
 <input
 class="form-control"
+id="project_name"
 name="project_name"
 placeholder="پروژه / محل مصرف / محل تحویل">
 </div>
@@ -376,12 +437,13 @@ placeholder="پروژه / محل مصرف / محل تحویل">
 <div class="mb-2">
 <input
 class="form-control"
+id="description"
 name="description"
 placeholder="توضیحات">
 </div>
 
 <div class="mb-2">
-<select class="form-select" name="type">
+<select class="form-select" name="type" id="move_type">
 
 <option value="IN">
 📥 ورود به انبار
