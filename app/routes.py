@@ -1399,3 +1399,48 @@ def api_check_serial():
         "success": True,
         "exists": exists is not None
     })
+
+@bp.route("/serials/bulk-add", methods=["POST"])
+def bulk_add_serials():
+
+    if "user" not in session:
+        return "Unauthorized", 401
+
+    product_id = request.form.get("product_id", type=int)
+    serials = request.form.get("serials", "").splitlines()
+
+    added = 0
+    duplicated = 0
+
+    for serial in serials:
+
+        serial = serial.strip()
+
+        if not serial:
+            continue
+
+        exists = ProductSerial.query.filter_by(
+            serial_number=serial
+        ).first()
+
+        if exists:
+            duplicated += 1
+            continue
+
+        db.session.add(
+            ProductSerial(
+                product_id=product_id,
+                serial_number=serial,
+                created_by=session["user"]
+            )
+        )
+
+        added += 1
+
+    db.session.commit()
+
+    flash(
+        f"{added} سریال ثبت شد - {duplicated} سریال تکراری بود"
+    )
+
+    return redirect(f"/serials/{product_id}")
