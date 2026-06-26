@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  inventory:
+    build: .
+    container_name: enterprise_inventory
+    ports:
+      - "5002:5001"
+    volumes:
+      - .:/app

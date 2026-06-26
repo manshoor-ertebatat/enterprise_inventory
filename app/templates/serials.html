@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+
+<head>
+<meta charset="UTF-8">
+<title>مدیریت سریال‌ها</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body class="container mt-4">
+
+<h2>🔢 سریال‌های کالا</h2>
+
+<h4>{{ product.name }}</h4>
+
+<hr>
+
+<form method="POST" action="/serials/add">
+
+<input
+type="hidden"
+name="product_id"
+value="{{ product.id }}">
+
+<div class="row">
+
+<div class="col-md-8">
+
+<input
+name="serial_number"
+class="form-control"
+placeholder="شماره سریال">
+
+</div>
+
+<div class="col-md-4">
+
+<button class="btn btn-success w-100">
+ثبت سریال
+</button>
+
+</div>
+
+</div>
+
+</form>
+
+<hr>
+
+<table class="table table-bordered">
+
+<tr>
+<th>ردیف</th>
+<th>سریال</th>
+<th>وضعیت</th>
+<th>مشتری</th>
+<th>شماره حواله</th>
+<th>عملیات</th>
+</tr>
+
+{% for s in serials %}
+
+<tr>
+
+<td>{{ loop.index }}</td>
+
+<td>{{ s.serial_number }}</td>
+
+<td>
+
+{% if s.status == "IN_STOCK" %}
+
+<span class="badge bg-success">
+موجود در انبار
+</span>
+
+{% else %}
+
+<span class="badge bg-danger">
+تحویل شده
+</span>
+
+{% endif %}
+
+</td>
+
+<td>{{ s.customer_name or "-" }}</td>
+
+<td>
+{% if s.movement_id %}
+<a href="/print-slip/{{ s.movement_id }}" target="_blank">
+حواله {{ s.movement_id }}
+</a>
+{% else %}
+-
+{% endif %}
+</td>
+
+<td>
+
+{% if s.status == "IN_STOCK" %}
+
+<form method="POST" action="/serials/deliver/{{ s.id }}">
+
+<select
+name="movement_id"
+class="form-select mb-1"
+required>
+
+<option value="">
+انتخاب حواله خروج
+</option>
+
+{% for m in out_movements %}
+
+{% if movement_serial_counts.get(m.id, 0) < m.qty %}
+
+<option value="{{ m.id }}">
+حواله {{ m.id }} - {{ m.customer_name or "بدون مشتری" }} - تعداد {{ m.qty }} - ثبت سریال {{ movement_serial_counts.get(m.id, 0) }} - باقی‌مانده {{ m.qty - movement_serial_counts.get(m.id, 0) }}
+</option>
+
+{% endif %}
+
+{% endfor %}
+
+</select>
+
+<button class="btn btn-success btn-sm">
+تحویل
+</button>
+
+</form>
+
+{% if session["role"] == "admin" %}
+
+<a
+href="/serials/delete/{{ s.id }}"
+class="btn btn-danger btn-sm mt-1"
+onclick="return confirm('آیا از حذف این سریال مطمئن هستید؟')">
+
+حذف سریال
+
+</a>
+
+{% endif %}
+
+{% else %}
+
+<span class="text-success">
+تحویل شده
+</span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<a href="/dashboard" class="btn btn-secondary">
+بازگشت
+</a>
+
+</body>
+</html>

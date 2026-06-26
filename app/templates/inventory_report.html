@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+
+<head>
+<meta charset="UTF-8">
+<title>گزارش موجودی انبار</title>
+
+<style>
+
+body{
+    font-family:tahoma;
+    padding:30px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #000;
+    padding:8px;
+    text-align:center;
+}
+
+button{
+    margin-bottom:20px;
+}
+
+@media print{
+    button{
+        display:none;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<button onclick="window.print()">
+🖨 چاپ گزارش
+</button>
+
+<h2 style="text-align:center">
+شرکت فنی و مهندسی منشور ارتباطات
+</h2>
+
+<h3 style="text-align:center">
+گزارش موجودی انبار
+</h3>
+
+<table>
+
+<tr>
+<th>ردیف</th>
+<th>نام کالا</th>
+<th>موجودی</th>
+<th>آخرین ثبت کننده</th>
+<th>آخرین ورود</th>
+<th>آخرین خروج</th>
+</tr>
+
+{% for item in report_data %}
+
+<tr>
+
+<td>{{ loop.index }}</td>
+
+<td>{{ item.product.name }}</td>
+
+<td>{{ item.product.qty }}</td>
+
+<td>{{ item.created_by }}</td>
+
+<td>
+{% if item.last_in %}
+{{ item.last_in|jalali }}
+{% endif %}
+</td>
+
+<td>
+{% if item.last_out %}
+{{ item.last_out|jalali }}
+{% endif %}
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>
