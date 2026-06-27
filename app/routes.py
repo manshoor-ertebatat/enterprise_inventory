@@ -707,6 +707,118 @@ def add_user():
 
     return redirect("/users")
 
+@bp.route("/users/delete/<int:id>")
+def delete_user(id):
+
+    if "user" not in session:
+        return redirect("/")
+
+    if session.get("role") != "admin":
+        return "Access Denied"
+
+    user = User.query.get(id)
+
+    if not user:
+        return "کاربر پیدا نشد"
+
+    # جلوگیری از حذف کاربر فعلی
+    if user.username == session["user"]:
+        flash(
+            "شما نمی‌توانید کاربری که با آن وارد شده‌اید را حذف کنید.",
+            "danger"
+        )
+        return redirect("/users")
+
+    # جلوگیری از حذف آخرین مدیر
+    if user.role == "admin":
+
+        admins = User.query.filter_by(role="admin").count()
+
+        if admins <= 1:
+
+            flash(
+                "آخرین مدیر سیستم قابل حذف نیست.",
+                "danger"
+            )
+
+            return redirect("/users")
+
+    username = user.username
+
+    db.session.delete(user)
+    db.session.commit()
+
+    log_activity(
+        session["user"],
+        "DELETE_USER",
+        f"حذف کاربر: {username}"
+    )
+
+    flash(
+        f"کاربر {username} حذف شد.",
+        "success"
+    )
+
+    return redirect("/users")
+
+@bp.route("/users/edit/<int:id>")
+def edit_user(id):
+
+    if "user" not in session:
+        return redirect("/")
+
+    if session.get("role") != "admin":
+        return "Access Denied"
+
+    user = User.query.get(id)
+
+    if not user:
+        return "کاربر پیدا نشد"
+
+    return render_template(
+        "edit_user.html",
+        user=user
+    )
+
+@bp.route("/users/update/<int:id>", methods=["POST"])
+def update_user(id):
+
+    if "user" not in session:
+        return redirect("/")
+
+    if session.get("role") != "admin":
+        return "Access Denied"
+
+    user = User.query.get(id)
+
+    if not user:
+        return "کاربر پیدا نشد"
+
+    username = request.form["username"].strip()
+    role = request.form["role"]
+    password = request.form["password"].strip()
+
+    user.username = username
+    user.role = role
+
+    if password:
+        user.password = password
+
+    db.session.commit()
+
+    log_activity(
+        session["user"],
+        "EDIT_USER",
+        f"ویرایش کاربر: {username}"
+    )
+
+    flash(
+        "اطلاعات کاربر با موفقیت ذخیره شد.",
+        "success"
+    )
+
+    return redirect("/users")
+
 @bp.route("/reports")
 def reports():
 
