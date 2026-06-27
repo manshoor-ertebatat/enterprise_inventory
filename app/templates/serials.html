@@ -11,6 +11,26 @@
 
 <body class="container mt-4">
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+
+<div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+
+{{ message }}
+
+<button
+type="button"
+class="btn-close"
+data-bs-dismiss="alert">
+</button>
+
+</div>
+
+{% endfor %}
+{% endif %}
+{% endwith %}
+
 <h2>🔢 سریال‌های کالا</h2>
 
 <h4>{{ product.name }}</h4>
@@ -24,19 +44,29 @@
 
 </div>
 
+<form method="POST" action="/serials/bulk-add">
+
+<input
+type="hidden"
+name="product_id"
+value="{{ product.id }}">
+
 <textarea
-id="bulk_serials"
+name="serials"
 class="form-control mb-3"
 rows="8"
-placeholder="هر شماره سریال در یک خط&#10;مثال:&#10;DS-001&#10;DS-002&#10;DS-003"></textarea>
+placeholder="هر شماره سریال در یک خط"
+required></textarea>
 
 <button
-id="bulk_add"
-class="btn btn-primary mb-3">
+class="btn btn-primary mb-3 w-100"
+type="submit">
 
 ثبت گروهی سریال‌ها
 
 </button>
+
+</form>
 
 <hr>
 
@@ -221,27 +251,36 @@ onclick="return confirm('آیا از حذف این سریال مطمئن هست�
 
 <script>
 
-document.addEventListener("DOMContentLoaded",function(){
+document.addEventListener("DOMContentLoaded", function () {
 
-const serial=document.getElementById("serial_number");
+    const form = document.getElementById("serial_form");
+    const serial = document.getElementById("serial_number");
+    const save = document.getElementById("save_serial");
 
-serial.focus();
+    serial.focus();
 
-serial.addEventListener("keydown",function(e){
+    serial.addEventListener("keydown", function (e) {
 
-if(e.key==="Enter"){
+        if (e.key === "Enter") {
 
-e.preventDefault();
+            e.preventDefault();
+            form.submit();
 
-this.form.submit();
+        }
 
-}
+    });
 
-});
+    save.addEventListener("click", function () {
+
+        form.submit();
+
+    });
 
 });
 
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

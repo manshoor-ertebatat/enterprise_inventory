@@ -1439,8 +1439,25 @@ def bulk_add_serials():
 
     db.session.commit()
 
-    flash(
-        f"{added} سریال ثبت شد - {duplicated} سریال تکراری بود"
-    )
+    if duplicated == 0:
+
+        flash(
+            f"{added} سریال با موفقیت ثبت شد.",
+            "success"
+        )
+
+    elif added == 0:
+
+        flash(
+            f"هیچ سریالی ثبت نشد. {duplicated} سریال تکراری بود.",
+            "warning"
+        )
+
+    else:
+
+        flash(
+            f"{added} سریال ثبت شد و {duplicated} سریال تکراری بود.",
+            "warning"
+        )
 
     return redirect(f"/serials/{product_id}")
