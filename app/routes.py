@@ -8,6 +8,21 @@ import io
 import os
 import jdatetime
 
+def normalize_digits(value):
+
+    if value is None:
+        return ""
+
+    persian = "۰۱۲۳۴۵۶۷۸۹"
+    arabic = "٠١٢٣٤٥٦٧٨٩"
+    english = "0123456789"
+
+    for i in range(10):
+        value = value.replace(persian[i], english[i])
+        value = value.replace(arabic[i], english[i])
+
+    return value
+
 bp = Blueprint("main", __name__)
 
 @bp.app_template_filter("jalali")
@@ -263,8 +278,13 @@ def add():
         return redirect("/dashboard")
 
     name = request.form.get("name", "").strip()
-    qty_text = request.form.get("qty", "0").strip()
-    min_qty_text = request.form.get("min_qty", "5").strip()
+    qty_text = normalize_digits(
+        request.form.get("qty", "0").strip()
+    )
+
+    min_qty_text = normalize_digits(
+        request.form.get("min_qty", "5").strip()
+    )
     unit = request.form.get("unit", "عدد").strip()
     category = request.form.get("category", "سایر").strip() or "سایر"
     condition = request.form.get("condition", "نو").strip() or "نو"

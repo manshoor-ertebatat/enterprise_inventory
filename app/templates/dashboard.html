@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html dir="rtl" lang="fa">
 
 <head>
@@ -219,7 +219,10 @@ body{
 
 <div class="card-body">
 
-<form method="POST" action="/add">
+<form
+id="add_product_form"
+method="POST"
+action="/add">
 
 <div class="mb-2">
 <input class="form-control" name="name" placeholder="نام کالا">
@@ -228,10 +231,36 @@ body{
 <div class="mb-2">
 <input
 class="form-control"
-type="number"
-min="0"
+type="text"
+inputmode="numeric"
 name="qty"
 placeholder="موجودی اولیه">
+</div>
+
+<div class="mb-2">
+
+<label class="form-label">
+واحد کالا
+</label>
+
+<select
+class="form-select"
+name="unit">
+
+<option value="عدد" selected>عدد</option>
+<option value="دستگاه">دستگاه</option>
+<option value="متر">متر</option>
+<option value="حلقه">حلقه</option>
+<option value="رول">رول</option>
+<option value="شاخه">شاخه</option>
+<option value="بسته">بسته</option>
+<option value="کارتن">کارتن</option>
+<option value="جعبه">جعبه</option>
+<option value="کیلوگرم">کیلوگرم</option>
+<option value="لیتر">لیتر</option>
+
+</select>
+
 </div>
 
 <div class="serial-option mb-3">
@@ -403,8 +432,8 @@ select.selectedIndex=0;
 <div class="mb-2">
 <input
 class="form-control"
-type="number"
-min="1"
+type="text"
+inputmode="numeric"
 name="qty"
 id="qty"
 placeholder="تعداد">
@@ -705,6 +734,48 @@ onclick="return confirm('آیا از حذف این کالا مطمئن هستی�
 </div>
 
 </div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.querySelector('form[action="/add"]');
+
+    if (!form) return;
+
+    const fields = [
+        form.querySelector('input[name="name"]'),
+        form.querySelector('input[name="qty"]'),
+        form.querySelector('select[name="unit"]'),
+        form.querySelector('input[name="has_serial"]')
+    ];
+
+    fields.forEach((field, index) => {
+
+        field.addEventListener("keydown", function (e) {
+
+            if (e.key !== "Enter")
+                return;
+
+            e.preventDefault();
+
+            if (index < fields.length - 1) {
+
+                fields[index + 1].focus();
+
+            } else {
+
+                form.submit();
+
+            }
+
+        });
+
+    });
+
+});
+
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
