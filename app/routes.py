@@ -1661,6 +1661,22 @@ def add_request():
         if not product_id:
             continue
 
+        product = Product.query.get(int(product_id))
+
+        requested_qty = int(qty)
+
+        if product.qty < requested_qty:
+
+            flash(
+                f"موجودی کالای «{product.name}» کافی نیست.",
+                "danger"
+            )
+
+            db.session.delete(req)
+            db.session.commit()
+
+            return redirect("/requests")
+
         db.session.add(
 
             MaterialRequestItem(
@@ -1669,7 +1685,7 @@ def add_request():
 
                 product_id=int(product_id),
 
-                qty=int(qty)
+                qty=requested_qty
 
             )
 
