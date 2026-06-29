@@ -34,6 +34,27 @@ class Product(db.Model):
     category = db.Column(db.String(100), default="سایر")
     condition = db.Column(db.String(50), default="نو")
 
+class Project(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    name = db.Column(
+        db.String(200),
+        unique=True
+    )
+
+    customer = db.Column(
+        db.String(200)
+    )
+
+    is_active = db.Column(
+        db.Integer,
+        default=1
+    )
+
 class Movement(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -117,6 +138,106 @@ class ProductSerial(db.Model):
     )
 
     timestamp = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+class MaterialRequest(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+
+    requester = db.Column(
+        db.String(100)
+    )
+
+    project_name = db.Column(
+        db.String(200)
+    )
+
+    description = db.Column(
+        db.String(500)
+    )
+
+    priority = db.Column(
+        db.String(30),
+        default="NORMAL"
+    )
+
+    location_description = db.Column(
+        db.String(1000)
+    )
+
+    status = db.Column(
+        db.String(30),
+        default="PENDING"
+    )
+
+    approved_by = db.Column(
+        db.String(100)
+    )
+
+    approved_at = db.Column(
+        db.DateTime
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+
+class MaterialRequestItem(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    request_id = db.Column(
+        db.Integer
+    )
+
+    product_id = db.Column(
+        db.Integer
+    )
+
+    qty = db.Column(
+        db.Integer
+    )
+
+    delivered_qty = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    note = db.Column(
+        db.String(300)
+    )
+
+class RequestNote(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    request_id = db.Column(
+        db.Integer
+    )
+
+    note = db.Column(
+        db.String(1000)
+    )
+
+    created_by = db.Column(
+        db.String(100)
+    )
+
+    created_at = db.Column(
         db.DateTime,
         default=datetime.utcnow
     )

@@ -1,10 +1,14 @@
-version: "3.8"
-
 services:
   inventory:
     build: .
-    container_name: enterprise_inventory
+    container_name: enterprise_inventory_v2
+
+    restart: unless-stopped
+
     ports:
-      - "5002:5001"
+      - "5003:5001"
+
     volumes:
       - .:/app
+
+    working_dir: /app

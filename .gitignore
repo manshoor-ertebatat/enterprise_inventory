@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Database
+instance/
+*.db
+
+# Backups
+backups/
+old_files/
+versions/
+app_backup_requests_v2/
+
+# Archives
+*.tar.gz
+*.zip
+
+# Temporary files
+*.before_rebuild
+*.bak
+*.tmp
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store

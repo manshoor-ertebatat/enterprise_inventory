@@ -1,6 +1,17 @@
 
 from flask import Blueprint, render_template, request, redirect, session, flash
-from app.models import db, Product, Movement, User, ActivityLog, ProductSerial
+from app.models import (
+    db,
+    Product,
+    Movement,
+    User,
+    ActivityLog,
+    ProductSerial,
+    MaterialRequest,
+    MaterialRequestItem,
+    Project,
+    RequestNote
+)
 from openpyxl import Workbook
 from flask import send_file, jsonify
 from sqlalchemy import func
@@ -1593,3 +1604,130 @@ def bulk_add_serials():
         )
 
     return redirect(f"/serials/{product_id}")
+
+@bp.route("/requests")
+def requests_page():
+
+    if "user" not in session:
+        return redirect("/")
+
+    requests = MaterialRequest.query.order_by(
+        MaterialRequest.id.desc()
+    ).all()
+
+    return render_template(
+        "requests.html",
+        requests=requests,
+        projects=Project.query.filter_by(
+            is_active=1
+        ).order_by(
+            Project.name
+        ).all(),
+        products=Product.query.filter_by(
+            is_active=1
+        ).order_by(
+            Product.name
+        ).all()
+    )
+
+@bp.route("/requests/add", methods=["POST"])
+def add_request():
+
+    if "user" not in session:
+        return redirect("/")
+
+    req = MaterialRequest(
+
+        requester=session["user"],
+
+        project_name=request.form.get("project_name"),
+
+        priority=request.form.get("priority"),
+
+        location_description=request.form.get("location_description"),
+
+        status="PENDING"
+
+    )
+
+    db.session.add(req)
+    db.session.commit()
+
+    product_ids = request.form.getlist("product_id[]")
+    qtys = request.form.getlist("qty[]")
+
+    for product_id, qty in zip(product_ids, qtys):
+
+        if not product_id:
+            continue
+
+        db.session.add(
+
+            MaterialRequestItem(
+
+                request_id=req.id,
+
+                product_id=int(product_id),
+
+                qty=int(qty)
+
+            )
+
+        )
+
+    db.session.commit()
+
+    flash("درخواست با موفقیت ثبت شد.", "success")
+
+    return redirect("/requests")
+
+@bp.route("/projects")
+def projects():
+
+    if "user" not in session:
+        return redirect("/")
+
+    projects = Project.query.order_by(
+        Project.name
+    ).all()
+
+    return render_template(
+        "projects.html",
+        projects=projects
+    )
+
+
+@bp.route("/projects/add", methods=["POST"])
+def add_project():
+
+    if "user" not in session:
+        return redirect("/")
+
+    if session.get("role") != "admin":
+        return "Access Denied"
+
+    name = request.form.get("name", "").strip()
+    customer = request.form.get("customer", "").strip()
+
+    if not name:
+        flash("نام پروژه وارد نشده است.", "danger")
+        return redirect("/projects")
+
+    exists = Project.query.filter_by(name=name).first()
+
+    if exists:
+        flash("این پروژه قبلاً ثبت شده است.", "warning")
+        return redirect("/projects")
+
+    db.session.add(
+        Project(
+            name=name,
+            customer=customer
+        )
+    )
+
+    db.session.commit()
+
+    flash("پروژه با موفقیت ثبت شد.", "success")
+
+    return redirect("/projects")
