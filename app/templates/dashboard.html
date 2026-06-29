@@ -130,15 +130,39 @@ body{
 
 <div class="col-md-4 text-md-start text-center mt-3 mt-md-0">
 
-{% if session["role"] == "admin" %}
-<a href="/users" class="btn btn-dark btn-sm">
-👥 مدیریت کاربران
-</a>
-{% endif %}
+<div class="d-flex flex-wrap justify-content-md-end justify-content-center gap-2">
 
-<a href="/logout" class="btn btn-light btn-sm">
-🚪 خروج
-</a>
+    <a href="/products" class="btn btn-primary btn-sm">
+        📦 کالاها
+    </a>
+
+    <a href="/requests" class="btn btn-success btn-sm">
+        📋 درخواست کالا
+    </a>
+
+    <a href="/projects" class="btn btn-info btn-sm">
+        🏗 پروژه‌ها
+    </a>
+
+    <a href="/reports" class="btn btn-warning btn-sm">
+        📊 گزارش‌ها
+    </a>
+
+    {% if session["role"] == "admin" %}
+    <a href="/users" class="btn btn-dark btn-sm">
+        👥 کاربران
+    </a>
+
+    <a href="/backup" class="btn btn-secondary btn-sm">
+        💾 پشتیبان
+    </a>
+    {% endif %}
+
+    <a href="/logout" class="btn btn-light btn-sm">
+        🚪 خروج
+    </a>
+
+</div>
 
 </div>
 
