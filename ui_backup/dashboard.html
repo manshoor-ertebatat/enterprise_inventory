@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}داشبورد{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="row mb-4">
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card-ui text-center">
+                <h2>{{ total_products }}</h2>
+                <p class="text-muted mb-0">کل کالاها</p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card-ui text-center">
+                <h2>{{ low_stock }}</h2>
+                <p class="text-warning mb-0">کم موجودی</p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card-ui text-center">
+                <h2>{{ out_of_stock }}</h2>
+                <p class="text-danger mb-0">اتمام موجودی</p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card-ui text-center">
+                <h2>{{ pending_requests }}</h2>
+                <p class="text-success mb-0">درخواست‌های باز</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-ui text-center mb-4">
+
+        <img src="/static/logo.png" class="logo-center mb-4" alt="Manshoor">
+
+        <h2>سیستم انبارداری منشور ارتباطات</h2>
+
+        <p class="text-muted">
+            خوش آمدید
+            <strong>{{ session["user"] }}</strong>
+        </p>
+
+    </div>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <a class="quick-btn d-block" href="/products">
+                📦<br>مدیریت کالاها
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a class="quick-btn d-block" href="/requests">
+                📋<br>درخواست کالا
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a class="quick-btn d-block" href="/projects">
+                🏗<br>پروژه‌ها
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a class="quick-btn d-block" href="/reports">
+                📊<br>گزارش‌ها
+            </a>
+        </div>
+
+    </div>
+
+    <div class="card-ui">
+        <h5 class="mb-3">آخرین کالاها</h5>
+
+        <table class="table table-hover align-middle">
+
+            <thead>
+                <tr>
+                    <th>شناسه</th>
+                    <th>نام کالا</th>
+                    <th>موجودی</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for p in products %}
+
+                <tr>
+
+                    <td>{{ p.id }}</td>
+
+                    <td>{{ p.name }}</td>
+
+                    <td>{{ p.qty }}</td>
+
+                    <td>
+                        <a class="btn btn-primary btn-sm" href="/edit/{{ p.id }}">
+                            ویرایش
+                        </a>
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

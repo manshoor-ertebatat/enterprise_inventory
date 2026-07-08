@@ -1,37 +1,185 @@
-<div class="list-group shadow-sm">
+{% set path = request.path %}
+<aside class="sidebar">
 
-    <a href="/dashboard" class="list-group-item list-group-item-action">
-        🏠 داشبورد
-    </a>
+    <div class="sidebar-logo">
 
-    <a href="/products" class="list-group-item list-group-item-action">
-        📦 کالاها
-    </a>
+        <img src="/static/logo.png" alt="Manshoor">
 
-    <a href="/requests" class="list-group-item list-group-item-action">
-        📋 درخواست کالا
-    </a>
+        <h4>منشور ارتباطات</h4>
 
-    <a href="/projects" class="list-group-item list-group-item-action">
-        🏗 پروژه‌ها
-    </a>
+        <span>Enterprise Inventory</span>
 
-    <a href="/reports" class="list-group-item list-group-item-action">
-        📊 گزارش‌ها
-    </a>
+    </div>
 
-    <a href="/activity-log" class="list-group-item list-group-item-action">
-        📑 فعالیت کاربران
-    </a>
+    <nav class="sidebar-menu">
 
-    <a href="/users" class="list-group-item list-group-item-action">
-        👤 کاربران
-    </a>
+        <a href="/dashboard"
+           class="{% if path == '/dashboard' %}active{% endif %}">
+            <i class="bi bi-grid-1x2-fill"></i>
+            <span>داشبورد</span>
+        </a>
 
-    <hr>
+        <details
+{% if path.startswith('/products')
+   or path.startswith('/serial')
+   or path.startswith('/stock')
+   or path.startswith('/edit')
+   or path.startswith('/delete') %}
+open
+{% endif %}
+>
 
-    <a href="/logout" class="list-group-item list-group-item-action text-danger">
-        🚪 خروج
-    </a>
+            <summary>
 
-</div>
+                <span>
+
+                    <i class="bi bi-box-seam"></i>
+
+                    کالاها
+
+                </span>
+
+                <i class="bi bi-chevron-down"></i>
+
+            </summary>
+
+            <a href="/products"
+               class="{% if path.startswith('/products') %}active{% endif %}">
+
+                لیست کالاها
+
+            </a>
+
+            <a href="/add">
+
+                افزودن کالا
+
+            </a>
+
+            <a href="/stock/in">
+
+                ورود کالا
+
+            </a>
+
+            <a href="/stock/out">
+
+                خروج کالا
+
+            </a>
+
+            <a href="/serials">
+
+                مدیریت سریال‌ها
+
+            </a>
+
+        </details>
+
+
+
+        <details open>
+
+            <summary>
+
+                <span>
+
+                    <i class="bi bi-clipboard-check"></i>
+
+                    درخواست‌ها
+
+                </span>
+
+{% if pending_requests|default(0) > 0 %}
+
+<span class="badge bg-danger rounded-pill">
+
+    {{ pending_requests }}
+
+</span>
+
+{% endif %}
+
+            </summary>
+
+            <a href="/requests"
+               class="{% if path.startswith('/requests') %}active{% endif %}">
+
+                درخواست‌های باز
+
+            </a>
+
+            <a href="/requests?status=done">
+
+                درخواست‌های تحویل شده
+
+            </a>
+
+            <a href="/requests/new">
+
+                ثبت درخواست جدید
+
+            </a>
+
+        </details>
+
+
+
+        <a href="/reports"
+           class="{% if path.startswith('/reports') %}active{% endif %}">
+
+            <i class="bi bi-bar-chart-fill"></i>
+
+            <span>گزارش‌ها</span>
+
+        </a>
+
+
+
+        <a href="/projects"
+           class="{% if path.startswith('/projects') %}active{% endif %}">
+
+            <i class="bi bi-building"></i>
+
+            <span>پروژه‌ها</span>
+
+        </a>
+
+
+
+{% if session.get("role")=="admin" %}
+
+        <a href="/users"
+           class="{% if path.startswith('/users') %}active{% endif %}">
+
+            <i class="bi bi-people-fill"></i>
+
+            <span>کاربران</span>
+
+        </a>
+
+{% endif %}
+
+
+
+        <a href="/backup">
+
+            <i class="bi bi-database-fill"></i>
+
+            <span>پشتیبان‌گیری</span>
+
+        </a>
+
+
+
+        <a href="/logout">
+
+            <i class="bi bi-box-arrow-right"></i>
+
+            <span>خروج از سیستم</span>
+
+        </a>
+
+    </nav>
+
+</aside>

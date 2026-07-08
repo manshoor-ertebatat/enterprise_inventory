@@ -2,27 +2,25 @@
 
     <div class="topbar-left">
 
-        <button class="menu-btn" id="sidebarToggle" type="button">
+        <button class="menu-btn">
             <i class="bi bi-list"></i>
         </button>
 
         <div class="company-title">
-            <h5 class="mb-0">منشور ارتباطات</h5>
+
+            <h5>منشور ارتباطات</h5>
+
             <small>سیستم انبارداری</small>
+
         </div>
 
     </div>
 
     <div class="topbar-center">
 
-        <a href="/dashboard">
-
-            <img
-                src="/static/logo.png"
-                class="header-logo"
-                alt="Manshoor">
-
-        </a>
+        <img src="/static/logo.png"
+             class="header-logo"
+             alt="Manshoor">
 
     </div>
 
@@ -32,19 +30,9 @@
 
             <i class="bi bi-person-circle"></i>
 
-            {{ session.get("user","کاربر") }}
+            {{ session["user"] }}
 
         </span>
-
-        {% if session.get("role") %}
-
-        <span class="badge bg-primary">
-
-            {{ session.get("role") }}
-
-        </span>
-
-        {% endif %}
 
         <a href="/logout" class="btn btn-danger btn-sm">
 
@@ -57,4 +45,3 @@
     </div>
 
 </header>
-

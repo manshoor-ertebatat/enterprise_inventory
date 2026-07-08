@@ -18,7 +18,6 @@ from sqlalchemy import func
 import io
 import os
 import jdatetime
-from datetime import datetime
 
 def normalize_digits(value):
 
@@ -151,14 +150,6 @@ def dashboard():
         if p.qty == 0
     ])
 
-    pending_requests = MaterialRequest.query.filter_by(
-        status="PENDING"
-    ).count()
-
-    approved_requests = MaterialRequest.query.filter_by(
-        status="APPROVED"
-    ).count()
-
     low_stock_products = [
         p for p in Product.query.filter(
             Product.is_active == 1,
@@ -208,8 +199,6 @@ def dashboard():
         all_active_products=all_active_products,
         low_stock_products=low_stock_products,
         out_of_stock_products=out_of_stock_products,
-        pending_requests=pending_requests,
-        approved_requests=approved_requests,
     )
 
 @bp.route("/products")
@@ -1894,132 +1883,6 @@ def update_request(id):
     )
 
     return redirect(f"/requests/view/{id}")
-
-@bp.route("/requests/issue/<int:id>")
-def issue_request(id):
-
-    if "user" not in session:
-        return redirect("/")
-
-    req = MaterialRequest.query.get_or_404(id)
-
-    items = MaterialRequestItem.query.filter_by(
-        request_id=id
-    ).all()
-
-    products = {
-        p.id: p
-        for p in Product.query.all()
-    }
-
-    return render_template(
-        "request_issue.html",
-        req=req,
-        items=items,
-        products=products
-    )
-
-@bp.route("/requests/issue/<int:id>", methods=["POST"])
-def issue_request_submit(id):
-
-    if "user" not in session:
-        return redirect("/")
-
-    req = MaterialRequest.query.get_or_404(id)
-
-    # اگر قبلاً تحویل شده باشد
-    if req.status == "APPROVED":
-
-        flash(
-            "این درخواست قبلاً تحویل شده است.",
-            "warning"
-        )
-
-        return redirect(f"/requests/view/{id}")
-
-    items = MaterialRequestItem.query.filter_by(
-        request_id=id
-    ).all()
-
-    # بررسی موجودی
-    for item in items:
-
-        product = Product.query.get(item.product_id)
-
-        if product.qty < item.qty:
-
-            flash(
-                f"موجودی کالای '{product.name}' کافی نیست.",
-                "danger"
-            )
-
-            return redirect(
-                f"/requests/issue/{id}"
-            )
-
-    # ثبت تحویل
-    for item in items:
-
-        product = Product.query.get(item.product_id)
-
-        # کسر موجودی
-        product.qty -= item.qty
-
-        item.delivered_qty = item.qty
-        
-        # ثبت تعداد تحویل شده
-        item.delivered_qty = item.qty
-
-        # ثبت گردش کالا
-        movement = Movement(
-            product_id=product.id,
-            type="OUT",
-            qty=item.qty,
-            receiver_name=req.requester,
-            project_name=req.project_name,
-            description=f"تحویل از درخواست شماره {req.id}",
-            created_by=session["user"]
-        )
-
-        db.session.add(movement)
-
-    # تغییر وضعیت درخواست
-    req.status = "APPROVED"
-    req.approved_by = session["user"]
-    req.approved_at = datetime.utcnow()
-
-    db.session.commit()
-
-    flash(
-        "درخواست با موفقیت تحویل شد.",
-        "success"
-    )
-
-    return redirect(f"/requests/view/{id}")
-
-@bp.route("/requests/print/<int:id>")
-def print_request(id):
-
-    if "user" not in session:
-        return redirect("/")
-
-    req = MaterialRequest.query.get_or_404(id)
-
-    items = MaterialRequestItem.query.filter_by(
-        request_id=id
-    ).all()
-
-    products = {
-        p.id: p
-        for p in Product.query.all()
-    }
-
-    return render_template(
-        "request_print.html",
-        req=req,
-        items=items,
-        products=products
-    )
 
 @bp.route("/projects")
 def projects():
