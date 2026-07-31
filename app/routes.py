@@ -10,7 +10,10 @@ from app.models import (
     MaterialRequest,
     MaterialRequestItem,
     Project,
-    RequestNote
+    RequestNote,
+    InventoryDocument,
+    InventoryDocumentItem,
+    ProjectReturn
 )
 from openpyxl import Workbook
 from flask import send_file, jsonify
@@ -142,12 +145,12 @@ def dashboard():
     total_products = len(all_products)
 
     low_stock = len([
-        p for p in products
+        p for p in all_products
         if p.qty > 0 and p.qty <= p.min_qty
     ])
 
     out_of_stock = len([
-        p for p in products
+        p for p in all_products
         if p.qty == 0
     ])
 
@@ -181,7 +184,9 @@ def dashboard():
 
     serial_counts = {}
 
-    for p in products:
+    serial_counts = {}
+
+    for p in all_products:
 
         serial_counts[p.id] = ProductSerial.query.filter_by(
             product_id=p.id,
@@ -222,9 +227,13 @@ def products_page():
     category = request.args.get("category", "").strip()
     stock_status = request.args.get("stock_status", "").strip()
     condition = request.args.get("condition", "").strip()
+    active = request.args.get("active", "").strip()
     page = request.args.get("page", 1, type=int)
 
-    query = Product.query
+    query = Product.query.order_by(
+        Product.is_active.desc(),
+        Product.id.desc()
+    )
 
     if search:
         query = query.filter(Product.name.contains(search))
@@ -234,6 +243,12 @@ def products_page():
 
     if condition:
         query = query.filter(Product.condition == condition)
+
+    if active == "1":
+       query = query.filter(Product.is_active == 1)
+
+    elif active == "0":
+        query = query.filter(Product.is_active == 0)
 
     if stock_status == "in_stock":
         query = query.filter(Product.qty > Product.min_qty)
@@ -246,8 +261,6 @@ def products_page():
 
     elif stock_status == "out_of_stock":
         query = query.filter(Product.qty == 0)
-
-    query = query.order_by(Product.id.desc())
 
     pagination = query.paginate(
         page=page,
@@ -285,6 +298,7 @@ def products_page():
         category=category,
         stock_status=stock_status,
         condition=condition,
+        active=active,
         categories=categories,
         serial_counts=serial_counts
     )
@@ -297,7 +311,7 @@ def add():
 
     if session.get("role") == "viewer":
         flash("شما اجازه ثبت کالا ندارید.", "danger")
-        return redirect("/dashboard")
+        return redirect("/products")
 
     name = request.form.get("name", "").strip()
     qty_text = normalize_digits(
@@ -310,22 +324,22 @@ def add():
     unit = request.form.get("unit", "عدد").strip()
     category = request.form.get("category", "سایر").strip() or "سایر"
     condition = request.form.get("condition", "نو").strip() or "نو"
-    has_serial = 1 if request.form.get("has_serial") else 0
+    has_serial = int(request.form.get("has_serial", 0))
 
     if not name:
         flash("نام کالا وارد نشده است.", "danger")
-        return redirect("/dashboard")
+        return redirect("/products")
 
     try:
         qty = int(qty_text)
         min_qty = int(min_qty_text)
     except ValueError:
         flash("موجودی اولیه و حداقل موجودی باید عدد باشند.", "danger")
-        return redirect("/dashboard")
+        return redirect("/products")
 
     if qty < 0 or min_qty < 0:
         flash("موجودی اولیه و حداقل موجودی نمی‌توانند منفی باشند.", "danger")
-        return redirect("/dashboard")
+        return redirect("/products")
 
     normalized_name = (
         name
@@ -348,7 +362,7 @@ def add():
 
         if existing_name == normalized_name:
             flash(f"کالایی با نام «{name}» قبلاً ثبت شده است.", "warning")
-            return redirect("/dashboard")
+            return redirect("/products")
 
     p = Product(
         name=name,
@@ -370,7 +384,7 @@ def add():
     )
 
     flash(f"کالای «{name}» با موفقیت ثبت شد.", "success")
-    return redirect("/dashboard")
+    return redirect("/products")
 
 @bp.route("/move", methods=["POST"])
 def move():
@@ -402,7 +416,7 @@ def move():
 
     if mtype == "OUT" and product.qty < qty:
         flash("موجودی کالا برای این خروج کافی نیست.", "danger")
-        return redirect("/dashboard")
+        return redirect("/products")
 
     if mtype == "OUT" and product.has_serial:
         available_serials = ProductSerial.query.filter_by(
@@ -415,7 +429,7 @@ def move():
                 f"تعداد سریال‌های موجود کافی نیست. موجود: {available_serials} - درخواست خروج: {qty}",
                 "danger"
             )
-            return redirect("/dashboard")
+            return redirect("/products")
 
     if mtype == "IN":
         product.qty += qty
@@ -457,7 +471,7 @@ def move():
         "success"
     )
 
-    return redirect("/dashboard")
+    return redirect("/products")
 @bp.route("/logout")
 def logout():
 
@@ -481,13 +495,13 @@ def delete_product(id):
 
     if session.get("role") != "admin":
         flash("فقط مدیر سیستم اجازه حذف کالا را دارد.", "danger")
-        return redirect("/dashboard")
+        return redirect("/products")
 
     product = Product.query.get(id)
 
     if not product:
         flash("کالا پیدا نشد.", "warning")
-        return redirect("/dashboard")
+        return redirect("/products")
 
     movement_count = Movement.query.filter_by(
         product_id=product.id
@@ -503,7 +517,7 @@ def delete_product(id):
             f"{movement_count} گردش و {serial_count} شماره سریال ثبت‌شده است.",
             "warning"
         )
-        return redirect("/dashboard")
+        return redirect("/products")
 
     product_name = product.name
 
@@ -517,7 +531,7 @@ def delete_product(id):
     )
 
     flash(f"کالای «{product_name}» با موفقیت حذف شد.", "success")
-    return redirect("/dashboard")
+    return redirect("/products")
 
 @bp.route("/product-toggle-active/<int:id>")
 def product_toggle_active(id):
@@ -557,13 +571,13 @@ def edit_product(id):
 
     if session.get("role") == "viewer":
         flash("شما اجازه ویرایش کالا ندارید.", "danger")
-        return redirect("/dashboard")
+        return redirect("/products")
 
     product = Product.query.get(id)
 
     if not product:
         flash("کالا پیدا نشد.", "warning")
-        return redirect("/dashboard")
+        return redirect("/products")
 
     if request.method == "POST":
 
@@ -660,7 +674,7 @@ def edit_product(id):
         )
 
         flash(f"تغییرات کالای «{product.name}» با موفقیت ذخیره شد.", "success")
-        return redirect("/dashboard")
+        return redirect("/products")
 
     return render_template(
         "edit_product.html",
@@ -1211,6 +1225,7 @@ def print_inventory_report():
     category = request.args.get("category", "").strip()
     stock_status = request.args.get("stock_status", "").strip()
     condition = request.args.get("condition", "").strip()
+    active = request.args.get("active", "").strip()
 
     query = Product.query
 
@@ -1222,6 +1237,12 @@ def print_inventory_report():
 
     if condition:
         query = query.filter(Product.condition == condition)
+
+    if active == "1":
+        query = query.filter(Product.is_active == 1)
+
+    elif active == "0":
+        query = query.filter(Product.is_active == 0)
 
     if stock_status == "in_stock":
         query = query.filter(Product.qty > Product.min_qty)
@@ -1409,10 +1430,16 @@ def serial_search():
                 result.product_id
             )
 
+    movement = None
+
+    if result and result.movement_id:
+        movement = Movement.query.get(result.movement_id)
+
     return render_template(
         "serial_search.html",
         result=result,
-        product=product
+        product=product,
+        movement=movement
     )
 
 @bp.route("/serials/deliver/<int:id>", methods=["POST"])
@@ -1912,11 +1939,71 @@ def issue_request(id):
         for p in Product.query.all()
     }
 
+    available_serials = {}
+
+    for product in products.values():
+
+        if product.has_serial:
+
+            available_serials[product.id] = ProductSerial.query.filter_by(
+                product_id=product.id,
+                status="IN_STOCK"
+            ).order_by(
+                ProductSerial.serial_number.asc()
+            ).all()
+
     return render_template(
         "request_issue.html",
         req=req,
         items=items,
-        products=products
+        products=products,
+        available_serials=available_serials
+    )
+
+@bp.route("/product/<int:id>")
+def product_view(id):
+
+    if "user" not in session:
+        return redirect("/")
+
+    product = Product.query.get_or_404(id)
+
+    movements = (
+        Movement.query
+        .filter_by(product_id=id)
+        .order_by(Movement.timestamp.desc())
+        .all()
+    )
+
+    serials = (
+        ProductSerial.query
+        .filter_by(product_id=id)
+        .all()
+    )
+
+    stock_in = sum(
+        m.qty for m in movements
+        if m.type == "IN"
+    )
+
+    stock_out = sum(
+        m.qty for m in movements
+        if m.type == "OUT"
+    )
+
+    serial_in_stock = sum(
+        1 for s in serials
+        if s.status == "IN_STOCK"
+    )
+
+    return render_template(
+        "product_view.html",
+        product=product,
+        movements=movements,
+        serials=serials,
+        stock_in=stock_in,
+        stock_out=stock_out,
+        serial_in_stock=serial_in_stock
     )
 
 @bp.route("/requests/issue/<int:id>", methods=["POST"])
@@ -1929,12 +2016,10 @@ def issue_request_submit(id):
 
     # اگر قبلاً تحویل شده باشد
     if req.status == "APPROVED":
-
         flash(
             "این درخواست قبلاً تحویل شده است.",
             "warning"
         )
-
         return redirect(f"/requests/view/{id}")
 
     items = MaterialRequestItem.query.filter_by(
@@ -1947,15 +2032,11 @@ def issue_request_submit(id):
         product = Product.query.get(item.product_id)
 
         if product.qty < item.qty:
-
             flash(
                 f"موجودی کالای '{product.name}' کافی نیست.",
                 "danger"
             )
-
-            return redirect(
-                f"/requests/issue/{id}"
-            )
+            return redirect(f"/requests/issue/{id}")
 
     # ثبت تحویل
     for item in items:
@@ -1965,8 +2046,6 @@ def issue_request_submit(id):
         # کسر موجودی
         product.qty -= item.qty
 
-        item.delivered_qty = item.qty
-        
         # ثبت تعداد تحویل شده
         item.delivered_qty = item.qty
 
@@ -1982,6 +2061,40 @@ def issue_request_submit(id):
         )
 
         db.session.add(movement)
+        db.session.flush()
+
+        # مدیریت شماره سریال
+        if product.has_serial:
+
+            serial_ids = request.form.getlist(
+                f"serial_ids_{product.id}[]"
+            )
+
+            if len(serial_ids) != item.qty:
+                flash(
+                    f"برای کالای «{product.name}» باید دقیقاً {item.qty} شماره سریال انتخاب شود.",
+                    "danger"
+                )
+                return redirect(f"/requests/issue/{id}")
+
+            for serial_id in serial_ids:
+
+                serial = ProductSerial.query.get(int(serial_id))
+
+                if (
+                    not serial
+                    or serial.product_id != product.id
+                    or serial.status != "IN_STOCK"
+                ):
+                    flash(
+                        "یکی از شماره سریال‌های انتخاب شده معتبر نیست.",
+                        "danger"
+                    )
+                    return redirect(f"/requests/issue/{id}")
+
+                serial.status = "OUT"
+                serial.movement_id = movement.id
+                serial.customer_name = req.requester
 
     # تغییر وضعیت درخواست
     req.status = "APPROVED"
@@ -1996,47 +2109,6 @@ def issue_request_submit(id):
     )
 
     return redirect(f"/requests/view/{id}")
-
-@bp.route("/requests/print/<int:id>")
-def print_request(id):
-
-    if "user" not in session:
-        return redirect("/")
-
-    req = MaterialRequest.query.get_or_404(id)
-
-    items = MaterialRequestItem.query.filter_by(
-        request_id=id
-    ).all()
-
-    products = {
-        p.id: p
-        for p in Product.query.all()
-    }
-
-    return render_template(
-        "request_print.html",
-        req=req,
-        items=items,
-        products=products
-    )
-
-@bp.route("/projects")
-def projects():
-
-    if "user" not in session:
-        return redirect("/")
-
-    projects = Project.query.order_by(
-        Project.name
-    ).all()
-
-    return render_template(
-        "projects.html",
-        projects=projects
-    )
-
-
 @bp.route("/projects/add", methods=["POST"])
 def add_project():
 

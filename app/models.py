@@ -241,3 +241,111 @@ class RequestNote(db.Model):
         db.DateTime,
         default=datetime.utcnow
     )
+class InventoryDocument(db.Model):
+    __tablename__ = "issue_slip"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    slip_number = db.Column(
+        db.String(30),
+        unique=True
+    )
+
+    request_id = db.Column(db.Integer)
+
+    project_name = db.Column(
+        db.String(200)
+    )
+
+    request_number = db.Column(
+        db.Integer
+    )
+
+    issue_type = db.Column(
+        db.String(30),
+        default="PROJECT"
+    )
+
+    delivered_to = db.Column(
+        db.String(150)
+    )
+
+    delivered_by = db.Column(
+        db.String(150)
+    )
+
+    status = db.Column(
+        db.String(30),
+        default="OPEN"
+    )
+
+    approved_by = db.Column(
+        db.String(100)
+    )
+
+    approved_at = db.Column(
+        db.DateTime
+    )
+
+    description = db.Column(
+        db.String(500)
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+    closed_at = db.Column(
+        db.DateTime
+    )
+
+class InventoryDocumentItem(db.Model):
+    __tablename__ = "issue_slip_item"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    slip_id = db.Column(db.Integer)
+
+    product_id = db.Column(db.Integer)
+
+    requested_qty = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    delivered_qty = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    returned_qty = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    note = db.Column(
+        db.String(300)
+    )
+
+
+class ProjectReturn(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    slip_item_id = db.Column(db.Integer)
+
+    qty = db.Column(db.Integer)
+
+    reason = db.Column(
+        db.String(300)
+    )
+
+    created_by = db.Column(
+        db.String(100)
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )

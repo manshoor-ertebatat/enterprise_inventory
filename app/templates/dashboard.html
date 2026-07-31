@@ -4,328 +4,36 @@
 
 {% block content %}
 
-<div class="container-fluid">
+<div class="dashboard-page container-fluid">
 
-    <div class="row justify-content-center">
+    <!-- Hero -->
+    {% include "includes/dashboard/hero.html" %}
 
-        <div class="col-xl-11">
+    <!-- Statistics -->
+    {% include "includes/dashboard/stat_cards.html" %}
 
-            <div class="row g-4 align-items-start">
+    <!-- Charts + Activity -->
+    <div class="row g-4 mt-1">
 
-                <!-- ستون چپ -->
+        <div class="col-lg-8">
+            {% include "includes/dashboard/chart.html" %}
+        </div>
 
-                <div class="col-lg-3">
+        <div class="col-lg-4">
+            {% include "includes/dashboard/activity.html" %}
+        </div>
 
-                    <div class="card-ui mb-3">
+    </div>
 
-                        <a href="/requests" class="d-flex justify-content-between align-items-center text-decoration-none">
+    <!-- Bottom Section -->
+    <div class="row g-4 mt-1">
 
-                            <div>
+        <div class="col-lg-6">
+            {% include "includes/dashboard/low_stock.html" %}
+        </div>
 
-                                <h5 class="mb-1">درخواست‌ها</h5>
-
-                                <small class="text-muted">
-                                    مدیریت درخواست‌های کالا
-                                </small>
-
-                            </div>
-
-                            <div class="text-center">
-
-                                <i class="bi bi-clipboard-check fs-1 text-success"></i>
-
-                                <h3 class="mt-2 text-success">
-                                    {{ pending_requests }}
-                                </h3>
-
-                            </div>
-
-                        </a>
-
-                    </div>
-
-                    <div class="card-ui mb-3">
-
-                        <a href="/reports" class="d-flex justify-content-between align-items-center text-decoration-none">
-
-                            <div>
-
-                                <h5 class="mb-1">گزارش‌ها</h5>
-
-                                <small class="text-muted">
-                                    گزارش‌های آماری
-                                </small>
-
-                            </div>
-
-                            <i class="bi bi-bar-chart-line-fill fs-1 text-primary"></i>
-
-                        </a>
-
-                    </div>
-
-                    <div class="card-ui mb-3">
-
-                        <a href="/projects" class="d-flex justify-content-between align-items-center text-decoration-none">
-
-                            <div>
-
-                                <h5 class="mb-1">پروژه‌ها</h5>
-
-                                <small class="text-muted">
-                                    مدیریت پروژه‌ها
-                                </small>
-
-                            </div>
-
-                            <i class="bi bi-building fs-1 text-warning"></i>
-
-                        </a>
-
-                    </div>
-
-{% if session.get("role")=="admin" %}
-
-                    <div class="card-ui">
-
-                        <a href="/users" class="d-flex justify-content-between align-items-center text-decoration-none">
-
-                            <div>
-
-                                <h5 class="mb-1">کاربران</h5>
-
-                                <small class="text-muted">
-                                    مدیریت کاربران
-                                </small>
-
-                            </div>
-
-                            <i class="bi bi-people-fill fs-1 text-info"></i>
-
-                        </a>
-
-                    </div>
-
-{% endif %}
-
-                </div>
-
-                <!-- ستون وسط -->
-                                 <div class="col-lg-6">
-
-                    <div class="card-ui text-center">
-
-                        <img src="/static/logo.png"
-                             class="logo-center mb-4"
-                             alt="Manshoor">
-
-                        <h2 class="fw-bold mb-3">
-                            سیستم انبارداری منشور ارتباطات
-                        </h2>
-
-                        <p class="text-muted mb-5">
-
-                            خوش آمدید
-
-                            <strong>{{ session.get("user") }}</strong>
-
-                        </p>
-
-                    </div>
-
-                    <div class="row g-3 mt-3">
-
-                        <div class="col-md-6">
-
-                            <a href="/products"
-                               class="quick-btn">
-
-                                <i class="bi bi-plus-circle fs-1 text-primary"></i>
-
-                                <h5 class="mt-3">
-                                    افزودن کالا
-                                </h5>
-
-                                <small class="text-muted">
-
-                                    ثبت کالای جدید
-
-                                </small>
-
-                            </a>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <a href="/requests"
-                               class="quick-btn">
-
-                                <i class="bi bi-clipboard-plus fs-1 text-success"></i>
-
-                                <h5 class="mt-3">
-                                    ثبت درخواست
-                                </h5>
-
-                                <small class="text-muted">
-
-                                    درخواست جدید
-
-                                </small>
-
-                            </a>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <a href="/reports"
-                               class="quick-btn">
-
-                                <i class="bi bi-bar-chart fs-1 text-warning"></i>
-
-                                <h5 class="mt-3">
-                                    گزارش‌ها
-                                </h5>
-
-                                <small class="text-muted">
-
-                                    گزارش‌های سیستم
-
-                                </small>
-
-                            </a>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <a href="/projects"
-                               class="quick-btn">
-
-                                <i class="bi bi-building fs-1 text-info"></i>
-
-                                <h5 class="mt-3">
-                                    پروژه‌ها
-                                </h5>
-
-                                <small class="text-muted">
-
-                                    مدیریت پروژه‌ها
-
-                                </small>
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- ستون راست -->
-                <div class="col-lg-3">
-
-                    <div class="card-ui mb-3">
-
-                        <a href="/products"
-                           class="d-flex justify-content-between align-items-center text-decoration-none">
-
-                            <div>
-
-                                <h5 class="mb-1">لیست کالاها</h5>
-
-                                <small class="text-muted">
-                                    مشاهده و مدیریت کالاها
-                                </small>
-
-                            </div>
-
-                            <div class="text-center">
-
-                                <i class="bi bi-box-seam fs-1 text-primary"></i>
-
-                                <h3 class="mt-2 text-primary">
-                                    {{ total_products }}
-                                </h3>
-
-                            </div>
-
-                        </a>
-
-                    </div>
-
-                    <div class="card-ui mb-3">
-
-                        <a href="/products"
-                           class="d-flex justify-content-between align-items-center text-decoration-none">
-
-                            <div>
-
-                                <h5 class="mb-1">مدیریت کالا</h5>
-
-                                <small class="text-muted">
-                                    افزودن و ویرایش کالا
-                                </small>
-
-                            </div>
-
-                            <i class="bi bi-pencil-square fs-1 text-success"></i>
-
-                        </a>
-
-                    </div>
-
-                    <div class="card-ui mb-3">
-
-                        <a href="/serials"
-                           class="d-flex justify-content-between align-items-center text-decoration-none">
-
-                            <div>
-
-                                <h5 class="mb-1">سریال کالاها</h5>
-
-                                <small class="text-muted">
-                                    مدیریت شماره سریال
-                                </small>
-
-                            </div>
-
-                            <i class="bi bi-upc-scan fs-1 text-warning"></i>
-
-                        </a>
-
-                    </div>
-
-{% if session.get("role")=="admin" %}
-
-                    <div class="card-ui">
-
-                        <a href="/backup"
-                           class="d-flex justify-content-between align-items-center text-decoration-none">
-
-                            <div>
-
-                                <h5 class="mb-1">پشتیبان</h5>
-
-                                <small class="text-muted">
-                                    تهیه نسخه پشتیبان
-                                </small>
-
-                            </div>
-
-                            <i class="bi bi-database-fill fs-1 text-danger"></i>
-
-                        </a>
-
-                    </div>
-
-{% endif %}
-
-                </div>
-
-            </div>
-
+        <div class="col-lg-6">
+            {% include "includes/dashboard/recent_requests.html" %}
         </div>
 
     </div>
@@ -333,4 +41,3 @@
 </div>
 
 {% endblock %}
-

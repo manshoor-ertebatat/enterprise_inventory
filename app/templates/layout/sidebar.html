@@ -1,178 +1,150 @@
 {% set path = request.path %}
+
 <aside class="sidebar">
 
-    <div class="sidebar-logo">
+    <div class="sidebar-top">
 
-        <img src="/static/logo.png" alt="Manshoor">
+        <div class="sidebar-brand">
 
-        <h4>منشور ارتباطات</h4>
+            <div class="sidebar-logo-card">
+                <img src="/static/logo.png" alt="Manshoor">
+            </div>
 
-        <span>Enterprise Inventory</span>
+            <h4>منشور ارتباطات</h4>
+
+            <span>Enterprise Inventory</span>
+
+        </div>
+
+        <nav class="sidebar-menu">
+
+            <a href="/dashboard"
+               class="{% if path == '/dashboard' %}active{% endif %}">
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span>داشبورد</span>
+            </a>
+
+            <details
+            {% if path.startswith('/products')
+               or path.startswith('/serial')
+               or path.startswith('/inventory')
+               or path.startswith('/edit')
+               or path.startswith('/delete') %}
+            open
+            {% endif %}>
+
+                <summary>
+
+                    <span>
+
+                        <i class="bi bi-box-seam"></i>
+
+                        کالاها
+
+                    </span>
+
+                    <i class="bi bi-chevron-down"></i>
+
+                </summary>
+
+                <a href="/products"
+                   class="{% if path.startswith('/products') %}active{% endif %}">
+                    مدیریت کالاها
+                </a>
+
+                <a href="/inventory"
+                   class="{% if path.startswith('/inventory') %}active{% endif %}">
+                    گردش انبار
+                </a>
+
+                <a href="/serials"
+                   class="{% if path.startswith('/serial') %}active{% endif %}">
+                    مدیریت سریال‌ها
+                </a>
+
+            </details>
+
+            <details {% if path.startswith('/requests') %}open{% endif %}>
+
+                <summary>
+
+                    <span>
+
+                        <i class="bi bi-clipboard-check"></i>
+
+                        درخواست‌ها
+
+                    </span>
+
+                    <i class="bi bi-chevron-down"></i>
+
+                </summary>
+
+                <a href="/requests"
+                   class="{% if path.startswith('/requests') %}active{% endif %}">
+                    درخواست‌های باز
+                </a>
+
+                <a href="/requests?status=done">
+                    درخواست‌های تحویل شده
+                </a>
+
+                <a href="/requests/new">
+                    ثبت درخواست جدید
+                </a>
+
+            </details>
+
+            <a href="/reports"
+               class="{% if path.startswith('/reports') %}active{% endif %}">
+                <i class="bi bi-bar-chart-fill"></i>
+                <span>گزارش‌ها</span>
+            </a>
+
+            <a href="/projects"
+               class="{% if path.startswith('/projects') %}active{% endif %}">
+                <i class="bi bi-building"></i>
+                <span>پروژه‌ها</span>
+            </a>
+
+            {% if session.get("role")=="admin" %}
+            <a href="/users"
+               class="{% if path.startswith('/users') %}active{% endif %}">
+                <i class="bi bi-people-fill"></i>
+                <span>کاربران</span>
+            </a>
+            {% endif %}
+
+            <a href="/backup">
+                <i class="bi bi-database-fill"></i>
+                <span>پشتیبان‌گیری</span>
+            </a>
+
+        </nav>
 
     </div>
 
-    <nav class="sidebar-menu">
+    <div class="sidebar-bottom">
 
-        <a href="/dashboard"
-           class="{% if path == '/dashboard' %}active{% endif %}">
-            <i class="bi bi-grid-1x2-fill"></i>
-            <span>داشبورد</span>
-        </a>
+        <div class="sidebar-user">
 
-        <details
-{% if path.startswith('/products')
-   or path.startswith('/serial')
-   or path.startswith('/stock')
-   or path.startswith('/edit')
-   or path.startswith('/delete') %}
-open
-{% endif %}
->
+            <div class="sidebar-user-avatar">
 
-            <summary>
+                <i class="bi bi-person-circle"></i>
 
-                <span>
+            </div>
 
-                    <i class="bi bi-box-seam"></i>
+            <div>
 
-                    کالاها
+                <strong>{{ session.get("user") }}</strong>
 
-                </span>
+                <small>{{ session.get("role")|default("User") }}</small>
 
-                <i class="bi bi-chevron-down"></i>
+            </div>
 
-            </summary>
+        </div>
 
-            <a href="/products"
-               class="{% if path.startswith('/products') %}active{% endif %}">
-
-                لیست کالاها
-
-            </a>
-
-            <a href="/add">
-
-                افزودن کالا
-
-            </a>
-
-            <a href="/stock/in">
-
-                ورود کالا
-
-            </a>
-
-            <a href="/stock/out">
-
-                خروج کالا
-
-            </a>
-
-            <a href="/serials">
-
-                مدیریت سریال‌ها
-
-            </a>
-
-        </details>
-
-
-
-        <details open>
-
-            <summary>
-
-                <span>
-
-                    <i class="bi bi-clipboard-check"></i>
-
-                    درخواست‌ها
-
-                </span>
-
-{% if pending_requests|default(0) > 0 %}
-
-<span class="badge bg-danger rounded-pill">
-
-    {{ pending_requests }}
-
-</span>
-
-{% endif %}
-
-            </summary>
-
-            <a href="/requests"
-               class="{% if path.startswith('/requests') %}active{% endif %}">
-
-                درخواست‌های باز
-
-            </a>
-
-            <a href="/requests?status=done">
-
-                درخواست‌های تحویل شده
-
-            </a>
-
-            <a href="/requests/new">
-
-                ثبت درخواست جدید
-
-            </a>
-
-        </details>
-
-
-
-        <a href="/reports"
-           class="{% if path.startswith('/reports') %}active{% endif %}">
-
-            <i class="bi bi-bar-chart-fill"></i>
-
-            <span>گزارش‌ها</span>
-
-        </a>
-
-
-
-        <a href="/projects"
-           class="{% if path.startswith('/projects') %}active{% endif %}">
-
-            <i class="bi bi-building"></i>
-
-            <span>پروژه‌ها</span>
-
-        </a>
-
-
-
-{% if session.get("role")=="admin" %}
-
-        <a href="/users"
-           class="{% if path.startswith('/users') %}active{% endif %}">
-
-            <i class="bi bi-people-fill"></i>
-
-            <span>کاربران</span>
-
-        </a>
-
-{% endif %}
-
-
-
-        <a href="/backup">
-
-            <i class="bi bi-database-fill"></i>
-
-            <span>پشتیبان‌گیری</span>
-
-        </a>
-
-
-
-        <a href="/logout">
+        <a href="/logout" class="logout-btn">
 
             <i class="bi bi-box-arrow-right"></i>
 
@@ -180,6 +152,6 @@ open
 
         </a>
 
-    </nav>
+    </div>
 
 </aside>

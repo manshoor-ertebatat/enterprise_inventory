@@ -1,0 +1,170 @@
+<div class="row g-4 mb-4">
+
+    <!-- تعداد کالاها -->
+    <div class="col-xl-3 col-lg-6">
+
+        <div class="stat-card stat-primary">
+
+            <div class="stat-card-top">
+
+                <div class="stat-icon">
+                    📦
+                </div>
+
+                <div class="stat-badge">
+                    کالا
+                </div>
+
+            </div>
+
+            <div class="stat-content">
+
+                <span class="stat-title">
+                    تعداد کالاها
+                </span>
+
+                <h2 class="stat-number">
+                    {{ total_products }}
+                </h2>
+
+                <div class="stat-footer">
+
+                    <span>
+                        ثبت شده در سیستم
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- موجودی کم -->
+    <div class="col-xl-3 col-lg-6">
+
+        <div class="stat-card stat-warning">
+
+            <div class="stat-card-top">
+
+                <div class="stat-icon">
+                    ⚠️
+                </div>
+
+                <div class="stat-badge">
+                    هشدار
+                </div>
+
+            </div>
+
+            <div class="stat-content">
+
+                <span class="stat-title">
+                    موجودی کم
+                </span>
+
+                <h2 class="stat-number">
+                    {{ low_stock }}
+                </h2>
+
+                <div class="stat-footer">
+
+                    <span>
+                        نیازمند شارژ
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- درخواست‌های باز -->
+    <div class="col-xl-3 col-lg-6">
+
+        <div class="stat-card stat-success">
+
+            <div class="stat-card-top">
+
+                <div class="stat-icon">
+                    📋
+                </div>
+
+                <div class="stat-badge">
+                    درخواست
+                </div>
+
+            </div>
+
+            <div class="stat-content">
+
+                <span class="stat-title">
+                    درخواست‌های باز
+                </span>
+
+                <h2 class="stat-number">
+                    {{ pending_requests }}
+                </h2>
+
+                <div class="stat-footer">
+
+                    <span>
+                        در انتظار رسیدگی
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- کالاهای ناموجود -->
+    <div class="col-xl-3 col-lg-6">
+
+        <div class="stat-card stat-danger">
+
+            <div class="stat-card-top">
+
+                <div class="stat-icon">
+                    🚫
+                </div>
+
+                <div class="stat-badge">
+                    بحرانی
+                </div>
+
+            </div>
+
+            <div class="stat-content">
+
+                <span class="stat-title">
+                    کالاهای ناموجود
+                </span>
+
+                <h2 class="stat-number">
+                    {{ out_of_stock }}
+                </h2>
+
+                <div class="stat-footer">
+
+                    <span>
+                        نیازمند تأمین
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

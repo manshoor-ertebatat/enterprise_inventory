@@ -1,0 +1,620 @@
+
+===== DUPLICATED SELECTORS =====
+
+.badge
+   components.css (1)
+   theme.css (1)
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.breadcrumb
+   components.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.breadcrumb-item
+   components.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.breadcrumb-item.active
+   components.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.breadcrumb-item+.breadcrumb-item::before
+   components.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.btn
+   components.css (1)
+   style.css (1)
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.btn-sm
+   components.css (1)
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.card
+   style.css (1)
+   theme.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.card-ui
+   components.css (1)
+   ui.css (4)
+   ui_backup.css (1)
+   ui_before_refactor.css (4)
+
+.card-ui a
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.card-ui form .btn
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.card-ui form label
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.card-ui h5
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.card-ui small
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.card-ui:hover
+   ui.css (2)
+   ui_backup.css (1)
+   ui_before_refactor.css (2)
+
+.content
+   layout.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.dashboard-actions
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.dashboard-actions-title
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.dashboard-hero
+   dashboard.css (3)
+   ui.css (4)
+   ui_before_refactor.css (4)
+
+.dashboard-hero .badge
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.dashboard-hero h2
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.dashboard-hero p
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.dashboard-logo
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.dashboard-page
+   dashboard.css (3)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.dashboard-page .card-ui
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.dashboard-page .card-ui:hover
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.dashboard-page .display-5
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.dashboard-page h2
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.dashboard-page small
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.form-control
+   components.css (1)
+   style.css (1)
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.form-control:focus
+   components.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.form-select
+   components.css (1)
+   style.css (1)
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.form-select:focus
+   components.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.header-logo
+   layout.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-badge
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-badge.danger
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-badge.primary
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-badge.warning
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-badges
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-company
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-description
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-footer
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.hero-header
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.hero-left
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-logo
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.hero-logo-box
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-right
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.hero-status
+   dashboard.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-subtitle
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-text
+   dashboard.css (2)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-title
+   dashboard.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.hero-update
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.hero-welcome
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.layout
+   layout.css (1)
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.logo-center
+   base.css (1)
+   ui.css (2)
+   ui_backup.css (1)
+   ui_before_refactor.css (2)
+
+.logout-btn
+   layout.css (1)
+   sidebar.css (1)
+
+.logout-btn:hover
+   layout.css (1)
+   sidebar.css (1)
+
+.page-content
+   layout.css (2)
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.page-subtitle
+   components.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.page-title
+   components.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.pagination
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.pagination .page-item.active .page-link
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.pagination .page-item.disabled .page-link
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.pagination .page-link
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.quick-btn
+   ui.css (2)
+   ui_backup.css (1)
+   ui_before_refactor.css (2)
+
+.quick-btn h5
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.quick-btn i
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.quick-btn small
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.quick-btn:hover
+   ui.css (2)
+   ui_backup.css (1)
+   ui_before_refactor.css (2)
+
+.row.g-4>.col-lg-3>.card-ui
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar
+   layout.css (2)
+   sidebar.css (1)
+   theme.css (1)
+   ui.css (3)
+   ui_before_refactor.css (3)
+
+.sidebar details
+   sidebar.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar details a
+   sidebar.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-bottom
+   layout.css (1)
+   sidebar.css (1)
+
+.sidebar-brand
+   layout.css (1)
+   sidebar.css (1)
+
+.sidebar-brand h4
+   layout.css (1)
+   sidebar.css (1)
+
+.sidebar-brand span
+   layout.css (1)
+   sidebar.css (1)
+
+.sidebar-logo
+   theme.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-logo img
+   theme.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-logo-card
+   layout.css (1)
+   sidebar.css (1)
+
+.sidebar-logo-card img
+   layout.css (1)
+   sidebar.css (1)
+
+.sidebar-menu
+   layout.css (1)
+   sidebar.css (1)
+   theme.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu .badge
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu .bi-chevron-down
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu a
+   layout.css (1)
+   theme.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu a:hover
+   layout.css (1)
+   theme.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu a.active
+   layout.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu a.active i
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu details
+   layout.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu details[open]
+   layout.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu details[open] > summary
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu details[open] summary .bi-chevron-down
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu details>a
+   layout.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu details>a:hover
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu details>a.active
+   layout.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu details>a.active:hover
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu i
+   layout.css (1)
+   sidebar.css (1)
+   theme.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu summary
+   layout.css (2)
+   theme.css (1)
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.sidebar-menu summary span:first-child
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu summary::-webkit-details-marker
+   layout.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu summary:hover
+   layout.css (1)
+   theme.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-menu>a
+   sidebar.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar-top
+   layout.css (1)
+   sidebar.css (1)
+
+.sidebar-user
+   layout.css (1)
+   sidebar.css (1)
+
+.sidebar-user small
+   layout.css (1)
+   sidebar.css (1)
+
+.sidebar-user strong
+   layout.css (1)
+   sidebar.css (1)
+
+.sidebar-user-avatar
+   layout.css (1)
+   sidebar.css (1)
+
+.sidebar::-webkit-scrollbar
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.sidebar::-webkit-scrollbar-thumb
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table
+   components.css (1)
+   style.css (1)
+   theme.css (2)
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.table tbody td
+   components.css (1)
+   theme.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table tbody td .badge
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table tbody td .btn
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table tbody tr
+   components.css (1)
+   theme.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table tbody tr td:first-child
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table tbody tr:hover
+   components.css (1)
+   theme.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table td .btn-danger
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table td .btn-info
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table td .btn-outline-secondary
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table td .btn-warning
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table td .btn:hover
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table thead th
+   components.css (1)
+   theme.css (1)
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.table-hover tbody tr
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table-hover tbody tr:hover
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table-hover tbody tr:nth-child(even)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table-hover td
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table-hover thead th
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.table-responsive
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+.topbar
+   layout.css (2)
+   ui.css (2)
+   ui_before_refactor.css (2)
+
+.user-name
+   layout.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+*
+   base.css (1)
+   theme.css (1)
+   ui.css (1)
+   ui_before_refactor.css (1)
+
+a
+   base.css (1)
+   ui_backup.css (1)
+
+body
+   base.css (1)
+   style.css (1)
+   theme.css (1)
+   ui.css (1)
+   ui_backup.css (1)
+   ui_before_refactor.css (1)
+
+--------------------------------
+CSS files : 14
+Duplicates: 133

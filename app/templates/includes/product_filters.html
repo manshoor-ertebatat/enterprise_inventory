@@ -1,0 +1,167 @@
+    <div class="card-ui mb-4">
+
+        <div class="p-4">
+
+            <form method="GET"
+                  action="/products">
+
+                <div class="row g-3">
+
+                    <div class="col-lg-3">
+
+                        <label class="form-label">
+
+                            جستجوی کالا
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="search"
+                            value="{{ search }}"
+                            placeholder="نام کالا ...">
+
+                    </div>
+
+                    <div class="col-lg-3">
+
+                        <label class="form-label">
+
+                            دسته‌بندی
+
+                        </label>
+
+                        <select
+                            class="form-select"
+                            name="category">
+
+                            <option value="">
+
+                                همه دسته‌بندی‌ها
+
+                            </option>
+
+                            {% for item in categories %}
+
+                            <option
+                                value="{{ item }}"
+                                {% if category==item %}selected{% endif %}>
+
+                                {{ item }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-lg-3">
+
+                        <label class="form-label">
+
+                            وضعیت موجودی
+
+                        </label>
+
+                        <select
+                            class="form-select"
+                            name="stock_status">
+
+                            <option value="">همه</option>
+
+                            <option value="in_stock"
+                            {% if stock_status=="in_stock" %}selected{% endif %}>
+                                موجود
+                            </option>
+
+                            <option value="low_stock"
+                            {% if stock_status=="low_stock" %}selected{% endif %}>
+                                کم موجود
+                            </option>
+
+                            <option value="out_of_stock"
+                            {% if stock_status=="out_of_stock" %}selected{% endif %}>
+                                اتمام موجودی
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-lg-3">
+
+                        <label class="form-label">
+
+                            وضعیت فیزیکی
+
+                        </label>
+
+                        <select
+                            class="form-select"
+                            name="condition">
+
+                            <option value="">همه</option>
+
+                            <option value="نو"
+                            {% if condition=="نو" %}selected{% endif %}>
+                                نو
+                            </option>
+
+                            <option value="دست‌دوم"
+                            {% if condition=="دست‌دوم" %}selected{% endif %}>
+                                دست دوم
+                            </option>
+
+                            <option value="مستهلک"
+                            {% if condition=="مستهلک" %}selected{% endif %}>
+                                مستهلک
+                            </option>
+
+                            <option value="نیازمند تعمیر"
+                            {% if condition=="نیازمند تعمیر" %}selected{% endif %}>
+                                نیازمند تعمیر
+                            </option>
+
+                            <option value="رزرو شده"
+                            {% if condition=="رزرو شده" %}selected{% endif %}>
+                                رزرو شده
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+
+                    <button class="btn btn-primary">
+
+                        <i class="bi bi-search"></i>
+
+                        جستجو
+
+                    </button>
+
+                    <a
+                        target="_blank"
+                        href="/print-inventory-report?search={{ search|urlencode }}&category={{ category|urlencode }}&stock_status={{ stock_status|urlencode }}&condition={{ condition|urlencode }}"
+                        class="btn btn-outline-dark">
+
+                        <i class="bi bi-printer"></i>
+
+                        چاپ موجودی
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+

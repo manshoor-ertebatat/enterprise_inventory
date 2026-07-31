@@ -1,0 +1,71 @@
+<div class="card-ui dashboard-hero mb-4">
+
+    <div class="row align-items-center">
+
+        <div class="col-lg-8">
+
+            <h2 class="fw-bold mb-3">
+
+                سلام
+                {{ session.get("user") }}
+                👋
+
+            </h2>
+
+            <p class="text-muted mb-4">
+
+                به سیستم انبارداری
+                <strong>منشور ارتباطات</strong>
+                خوش آمدید.
+
+            </p>
+
+            <div class="d-flex flex-wrap gap-2">
+
+                <span class="badge bg-primary fs-6 px-3 py-2">
+
+                    📦 {{ total_products }} کالا
+
+                </span>
+
+                <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+
+                    ⚠️ {{ low_stock }} موجودی کم
+
+                </span>
+
+                <span class="badge bg-danger fs-6 px-3 py-2">
+
+                    🚫 {{ out_of_stock }} ناموجود
+
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-4 text-center">
+
+            <img
+                src="/static/logo.png"
+                class="dashboard-logo img-fluid"
+                style="max-height:140px"
+                alt="Manshoor">
+
+            <h5 class="mt-3 fw-bold">
+
+                منشور ارتباطات
+
+            </h5>
+
+            <small class="text-muted">
+
+                Enterprise Inventory
+
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
