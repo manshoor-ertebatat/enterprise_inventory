@@ -80,13 +80,7 @@ body{margin:0;background:var(--bg);color:var(--text)}
  box-shadow:var(--shadow)
 }
 .card-ui{padding:22px}
-.quick-btn{
- display:block;background:#fff;border-radius:14px;
- padding:22px;text-align:center;text-decoration:none;
- color:var(--text);box-shadow:var(--shadow);
- transition:.2s
-}
-.quick-btn:hover{transform:translateY(-3px)}
+
 .card-ui a{
 
 color:inherit !important;
@@ -140,9 +134,7 @@ justify-content:center;
  border-radius:10px;min-height:44px
 }
 .btn{border-radius:10px}
-.logo-center{
- display:block;margin:0 auto;max-width:220px
-}
+
 @media(max-width:992px){
  .layout{display:block}
  .sidebar{width:100%;height:auto;position:relative}
@@ -165,91 +157,6 @@ margin-top:25px;
 
 }
 
-.dashboard-actions-title{
-
-font-size:22px;
-
-font-weight:700;
-
-text-align:center;
-
-margin-bottom:25px;
-
-}
-
-.quick-btn{
-
-height:170px;
-
-display:flex;
-
-flex-direction:column;
-
-justify-content:center;
-
-align-items:center;
-
-background:#fff;
-
-border-radius:18px;
-
-transition:.25s;
-
-}
-
-.quick-btn:hover{
-
-transform:translateY(-6px);
-
-box-shadow:0 18px 35px rgba(0,0,0,.10);
-
-}
-
-.quick-btn i{
-
-font-size:42px!important;
-
-margin-bottom:18px;
-
-}
-
-.quick-btn h5{
-
-font-size:20px;
-
-font-weight:700;
-
-margin-bottom:8px;
-
-}
-
-.quick-btn small{
-
-font-size:14px;
-
-color:#888;
-
-}
-
-.card-ui{
-
-transition:.25s;
-
-}
-
-.card-ui:hover{
-
-transform:translateY(-5px);
-
-}
-
-.logo-center{
-
-    display:block;
-    margin:0 auto;
-    max-width:240px;
-
-}
 /* =====================================================
    ERP Components
 ===================================================== */
@@ -548,41 +455,7 @@ transform:translateY(-5px);
 .sidebar-menu details>a.active:hover{
     background:#2563eb;
 }
-/* ===== Breadcrumb ===== */
 
-.breadcrumb{
-
-background:#fff;
-
-padding:12px 18px;
-
-border-radius:12px;
-
-box-shadow:var(--shadow);
-
-margin-bottom:20px;
-
-}
-
-.breadcrumb-item{
-
-font-size:14px;
-
-}
-
-.breadcrumb-item+.breadcrumb-item::before{
-
-content:"/";
-
-}
-
-.breadcrumb-item.active{
-
-font-weight:700;
-
-color:var(--primary);
-
-}
 /* ===== Requests ===== */
 
 .table-hover tbody tr{
