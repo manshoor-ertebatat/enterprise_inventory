@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}
+گردش انبار
+{% endblock %}
+
+{% block content %}
+
+<div class="card-ui">
+
+    <div class="p-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <h4 class="fw-bold mb-0">
+                گردش انبار
+            </h4>
+
+            <span class="badge bg-primary">
+                {{ movements|length }} گردش
+            </span>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th width="70">ردیف</th>
+                        <th>تاریخ</th>
+                        <th>کالا</th>
+                        <th>نوع</th>
+                        <th>تعداد</th>
+                        <th>پروژه</th>
+                        <th>گیرنده</th>
+                        <th>ثبت‌کننده</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for m in movements %}
+
+                    <tr>
+
+                        <td>{{ loop.index }}</td>
+
+                        <td>{{ m.timestamp|jalali }}</td>
+
+                        <td>
+                            {{ products[m.product_id].name if m.product_id in products else "-" }}
+                        </td>
+
+                        <td>
+
+                            {% if m.type == "IN" %}
+                                <span class="badge bg-success">ورود</span>
+                            {% else %}
+                                <span class="badge bg-danger">خروج</span>
+                            {% endif %}
+
+                        </td>
+
+                        <td>{{ m.qty }}</td>
+
+                        <td>{{ m.project_name or "-" }}</td>
+
+                        <td>{{ m.receiver_name or "-" }}</td>
+
+                        <td>{{ m.created_by }}</td>
+
+                    </tr>
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="8" class="text-center py-5">
+
+                            هیچ گردش انباری ثبت نشده است.
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

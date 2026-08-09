@@ -80,16 +80,16 @@
 
                 </summary>
 
-                <a href="/requests"
+                <a href="/requests?status=PENDING"
                    class="{% if path.startswith('/requests') %}active{% endif %}">
                     درخواست‌های باز
                 </a>
 
-                <a href="/requests?status=done">
+                <a href="/requests?status=APPROVED">
                     درخواست‌های تحویل شده
                 </a>
 
-                <a href="/requests/new">
+                <a href="/requests#new-request">
                     ثبت درخواست جدید
                 </a>
 

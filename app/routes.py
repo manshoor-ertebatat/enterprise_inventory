@@ -386,6 +386,80 @@ def add():
     flash(f"کالای «{name}» با موفقیت ثبت شد.", "success")
     return redirect("/products")
 
+def build_movement_query():
+
+    movement_type = request.args.get("type", "").strip()
+    created_by = request.args.get("created_by", "").strip()
+    product_name = request.args.get("product_name", "").strip()
+    project_name = request.args.get("project_name", "").strip()
+
+    date_from = request.args.get("date_from", "").strip()
+    date_to = request.args.get("date_to", "").strip()
+
+    query = Movement.query
+
+    if movement_type:
+        query = query.filter(
+            Movement.type == movement_type
+        )
+
+    if created_by:
+        query = query.filter(
+            Movement.created_by.contains(created_by)
+        )
+
+    if project_name:
+        query = query.filter(
+            Movement.project_name.contains(project_name)
+        )
+
+    if product_name:
+
+        product_ids = [
+            product.id
+            for product in Product.query.filter(
+                Product.name.contains(product_name)
+            ).all()
+        ]
+
+        query = query.filter(
+            Movement.product_id.in_(product_ids)
+        )
+
+    if date_from:
+
+        y, m, d = map(int, date_from.split("/"))
+
+        g_from = (
+            jdatetime.date(y, m, d)
+            .togregorian()
+        )
+
+        query = query.filter(
+            Movement.timestamp >= datetime.combine(
+                g_from,
+                datetime.min.time()
+            )
+        )
+
+    if date_to:
+
+        y, m, d = map(int, date_to.split("/"))
+
+        g_to = (
+            jdatetime.date(y, m, d)
+            .togregorian()
+        )
+
+        query = query.filter(
+            Movement.timestamp <= datetime.combine(
+                g_to,
+                datetime.max.time()
+            )
+        )
+
+    return query
+
 @bp.route("/move", methods=["POST"])
 def move():
 
@@ -881,58 +955,20 @@ def reports():
     if "user" not in session:
         return redirect("/")
 
-    movement_type = request.args.get("type")
-    created_by = request.args.get("created_by")
-    product_name = request.args.get("product_name")
-    project_name = request.args.get("project_name", "").strip()
-
-    date_from = request.args.get("date_from")
-    date_to = request.args.get("date_to")
-
-    query = Movement.query
-
-    if movement_type:
-        query = query.filter_by(type=movement_type)
-
-    if created_by:
-        query = query.filter(
-            Movement.created_by.contains(created_by)
-        )
-
-    if project_name:
-        query = query.filter(
-            Movement.project_name.contains(project_name)
-        )
-
-    if date_from:
-        query = query.filter(
-            Movement.timestamp >= date_from
-        )
-
-    if date_to:
-        query = query.filter(
-            Movement.timestamp <= date_to + " 23:59:59"
-        )
-
-    if product_name:
-        product_ids = [
-            p.id
-            for p in Product.query.filter(
-                Product.name.contains(product_name)
-            ).all()
-        ]
-
-        query = query.filter(
-            Movement.product_id.in_(product_ids)
-        )
+    query = build_movement_query()
 
     page = request.args.get("page", 1, type=int)
+
+    per_page = request.args.get("per_page", 10, type=int)
+
+    if per_page not in (10, 25, 50, 100):
+        per_page = 10
 
     pagination = query.order_by(
         Movement.id.desc()
     ).paginate(
         page=page,
-        per_page=30,
+        per_page=per_page,
         error_out=False
     )
 
@@ -973,43 +1009,56 @@ def export_report_excel():
     if "user" not in session:
         return redirect("/")
 
+    query = build_movement_query()
+
+    movements = (
+        query
+        .order_by(Movement.id.desc())
+        .all()
+    )
+
     wb = Workbook()
     ws = wb.active
-
     ws.title = "Reports"
 
     ws.append([
-        "Product",
-        "Type",
-        "Quantity",
-        "Receiver",
-        "Customer",
-        "Created By",
-        "Timestamp"
+        "نام کالا",
+        "نوع عملیات",
+        "تعداد",
+        "تحویل گیرنده",
+        "مشتری",
+        "ثبت کننده",
+        "تاریخ"
     ])
 
     products_dict = {}
 
-    for p in Product.query.all():
-        products_dict[p.id] = p.name
+    for product in Product.query.all():
+        products_dict[product.id] = product.name
 
-    movements = Movement.query.order_by(
-        Movement.id.desc()
-    ).all()
-
-    for m in movements:
+    for movement in movements:
 
         ws.append([
+
             products_dict.get(
-                m.product_id,
-                m.product_id
+                movement.product_id,
+                movement.product_id
             ),
-            m.type,
-            m.qty,
-            m.receiver_name,
-            m.customer_name,
-            m.created_by,
-            str(m.timestamp)
+
+            "ورود" if movement.type == "IN" else "خروج",
+
+            movement.qty,
+
+            movement.receiver_name,
+
+            movement.customer_name,
+
+            movement.created_by,
+
+            jdatetime.datetime.fromgregorian(
+                datetime=movement.timestamp
+            ).strftime("%Y/%m/%d %H:%M")
+
         ])
 
     output = io.BytesIO()
@@ -1097,7 +1146,7 @@ def activity_log():
         ActivityLog.id.desc()
     ).paginate(
         page=page,
-        per_page=30,
+        per_page=10,
         error_out=False
     )
 
@@ -1215,6 +1264,30 @@ def print_slip(id):
         serials=serials
     )
 
+
+@bp.route("/inventory")
+def inventory():
+
+    if "user" not in session:
+        return redirect("/")
+
+    movements = (
+        Movement.query
+        .order_by(Movement.timestamp.desc())
+        .all()
+    )
+
+    products = {
+        p.id: p
+        for p in Product.query.all()
+    }
+
+    return render_template(
+        "inventory.html",
+        movements=movements,
+        products=products
+    )
+
 @bp.route("/print-inventory-report")
 def print_inventory_report():
 
@@ -1327,6 +1400,38 @@ def print_movements_report():
         project_name=project_name,
         date_from=date_from,
         date_to=date_to
+    )
+
+@bp.route("/serials")
+def serials_index():
+
+    if "user" not in session:
+        return redirect("/")
+
+    products = (
+        Product.query
+        .filter_by(
+            has_serial=1,
+            is_active=1
+        )
+        .order_by(Product.name)
+        .all()
+    )
+
+    serial_counts = {}
+
+    for product in products:
+
+        serial_counts[product.id] = (
+            ProductSerial.query
+            .filter_by(product_id=product.id)
+            .count()
+        )
+
+    return render_template(
+        "serials_index.html",
+        products=products,
+        serial_counts=serial_counts
     )
 
 @bp.route("/serials/<int:product_id>")
@@ -1649,13 +1754,26 @@ def requests_page():
     if "user" not in session:
         return redirect("/")
 
-    requests = MaterialRequest.query.order_by(
-        MaterialRequest.id.desc()
-    ).all()
+    status = request.args.get("status", "PENDING")
+
+    query = MaterialRequest.query
+
+    if status == "APPROVED":
+        query = query.filter_by(status="APPROVED")
+
+    else:
+        query = query.filter_by(status="PENDING")
+
+    requests = (
+        query
+        .order_by(MaterialRequest.id.desc())
+        .all()
+    )
 
     return render_template(
         "requests.html",
         requests=requests,
+        status=status,
         projects=Project.query.filter_by(
             is_active=1
         ).order_by(
@@ -1667,6 +1785,14 @@ def requests_page():
             Product.name
         ).all()
     )
+
+@bp.route("/requests/new")
+def new_request():
+
+    if "user" not in session:
+        return redirect("/")
+
+    return redirect("/requests#new-request")
 
 @bp.route("/requests/add", methods=["POST"])
 def add_request():
@@ -2109,6 +2235,23 @@ def issue_request_submit(id):
     )
 
     return redirect(f"/requests/view/{id}")
+@bp.route("/projects")
+def projects():
+
+    if "user" not in session:
+        return redirect("/")
+
+    projects = (
+        Project.query
+        .order_by(Project.name)
+        .all()
+    )
+
+    return render_template(
+        "projects.html",
+        projects=projects
+    )
+
 @bp.route("/projects/add", methods=["POST"])
 def add_project():
 
