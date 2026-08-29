@@ -1027,6 +1027,8 @@ def export_report_excel():
         "تعداد",
         "تحویل گیرنده",
         "مشتری",
+        "پروژه",
+        "شماره سریال",
         "ثبت کننده",
         "تاریخ"
     ])
@@ -1037,6 +1039,19 @@ def export_report_excel():
         products_dict[product.id] = product.name
 
     for movement in movements:
+
+        serials = (
+            ProductSerial.query
+            .filter_by(movement_id=movement.id)
+            .order_by(ProductSerial.id.asc())
+            .all()
+        )
+
+        serial_numbers = ", ".join(
+            serial.serial_number
+            for serial in serials
+            if serial.serial_number
+        )
 
         ws.append([
 
@@ -1049,11 +1064,15 @@ def export_report_excel():
 
             movement.qty,
 
-            movement.receiver_name,
+            movement.receiver_name or "",
 
-            movement.customer_name,
+            movement.customer_name or "",
 
-            movement.created_by,
+            movement.project_name or "",
+
+            serial_numbers,
+
+            movement.created_by or "",
 
             jdatetime.datetime.fromgregorian(
                 datetime=movement.timestamp
@@ -1071,7 +1090,10 @@ def export_report_excel():
         output,
         as_attachment=True,
         download_name="report.xlsx",
-        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        mimetype=(
+            "application/vnd.openxmlformats-officedocument."
+            "spreadsheetml.sheet"
+        )
     )
 
 @bp.route("/backup")

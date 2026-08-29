@@ -90,7 +90,8 @@ placeholder="نام کالا">
 
 </form>
 
-<a href="/export_report_excel"
+<a
+href="/export_report_excel?type={{ request.args.get('type', '')|urlencode }}&created_by={{ request.args.get('created_by', '')|urlencode }}&product_name={{ request.args.get('product_name', '')|urlencode }}&project_name={{ request.args.get('project_name', '')|urlencode }}&date_from={{ request.args.get('date_from', '')|urlencode }}&date_to={{ request.args.get('date_to', '')|urlencode }}"
 class="btn btn-success mb-3">
 
 📥 خروجی اکسل گزارشات
