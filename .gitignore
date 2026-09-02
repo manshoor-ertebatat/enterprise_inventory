@@ -28,3 +28,23 @@ app_backup_requests_v2/
 
 # macOS
 .DS_Store
+
+# Generated / local development files
+node_modules/
+*:Zone.Identifier
+
+# Local backup / legacy files
+*_backup*
+backup_*/
+ui_backup/
+backup_ui/
+*.bak
+*.save
+*.pyy
+
+# Legacy UI files
+ui_before_refactor.css
+base_before_ui.html
+base_old.html
+header_old.html
+sidebar_old.html
