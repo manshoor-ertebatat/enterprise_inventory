@@ -1,23 +1,113 @@
-<!DOCTYPE html>
-<html dir="rtl" lang="fa">
+{% extends "base.html" %}
 
-<head>
-<meta charset="UTF-8">
-<title>مدیریت سریال‌ها</title>
+{% block title %}
+مدیریت سریال‌ها
+{% endblock %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-</head>
+{% block content %}
 
 <body class="container mt-4">
 
-<h2>🔢 سریال‌های کالا</h2>
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
 
-<h4>{{ product.name }}</h4>
+<div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+
+{{ message }}
+
+<button
+type="button"
+class="btn-close"
+data-bs-dismiss="alert">
+</button>
+
+</div>
+
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="card-ui mb-4">
+
+    <div class="p-4 d-flex justify-content-between align-items-center">
+
+        <div>
+
+            <h3 class="fw-bold mb-1">
+
+                🔢 مدیریت سریال‌ها
+
+            </h3>
+
+            <div class="text-muted">
+
+                {{ product.name }}
+
+            </div>
+
+        </div>
+
+        <span class="badge bg-primary fs-6">
+
+            {{ serials|length }} سریال
+
+        </span>
+
+    </div>
+
+</div>
+
+<div class="card-ui mb-4">
+    <div class="p-4">
+
+<div class="alert alert-info mb-3">
+
+<b>ثبت گروهی سریال</b><br>
+
+می‌توانید چند شماره سریال را با بارکدخوان یا Paste وارد کنید.
+هر سریال را در یک خط قرار دهید.
+
+</div>
+
+<form method="POST" action="/serials/bulk-add">
+
+<input
+type="hidden"
+name="product_id"
+value="{{ product.id }}">
+
+<textarea
+name="serials"
+class="form-control mb-3"
+rows="8"
+placeholder="هر شماره سریال در یک خط"
+required></textarea>
+
+<button
+class="btn btn-primary mb-3 w-100"
+type="submit">
+
+ثبت گروهی سریال‌ها
+
+</button>
+
+</form>
+
+    </div>
+
+</div>
 
 <hr>
 
-<form method="POST" action="/serials/add">
+<div class="card-ui mb-4">
+    <div class="p-4">
+
+<form
+id="serial_form"
+method="POST"
+action="/serials/add"
+autocomplete="off">
 
 <input
 type="hidden"
@@ -29,16 +119,33 @@ value="{{ product.id }}">
 <div class="col-md-8">
 
 <input
+id="serial_number"
 name="serial_number"
-class="form-control"
-placeholder="شماره سریال">
+class="form-control form-control-lg"
+placeholder="📷 شماره سریال را اسکن یا تایپ کنید"
+autocomplete="off"
+spellcheck="false"
+enterkeyhint="done"
+autofocus
+required>
+
+<div class="form-text mt-2">
+
+اسکن کنید و Enter بزنید.
+
+</div>
 
 </div>
 
 <div class="col-md-4">
 
-<button class="btn btn-success w-100">
-ثبت سریال
+<button
+id="save_serial"
+class="btn btn-success w-100"
+type="button">
+
+💾 ثبت سریال
+
 </button>
 
 </div>
@@ -47,7 +154,26 @@ placeholder="شماره سریال">
 
 </form>
 
+    </div>
+
+</div>
+
+<div
+id="serial_counter"
+class="alert alert-info mt-3">
+
+تعداد سریال‌های ثبت‌شده:
+<b>{{ serials|length }}</b>
+
+</div>
+
 <hr>
+
+<div class="card-ui">
+
+    <div class="p-4">
+
+        <div class="table-responsive">
 
 <table class="table table-bordered">
 
@@ -162,9 +288,45 @@ onclick="return confirm('آیا از حذف این سریال مطمئن هست�
 
 </table>
 
+        </div>
+
+    </div>
+
+</div>
+
 <a href="/dashboard" class="btn btn-secondary">
 بازگشت
 </a>
 
-</body>
-</html>
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("serial_form");
+    const serial = document.getElementById("serial_number");
+    const save = document.getElementById("save_serial");
+
+    serial.focus();
+
+    serial.addEventListener("keydown", function (e) {
+
+        if (e.key === "Enter") {
+
+            e.preventDefault();
+            form.submit();
+
+        }
+
+    });
+
+    save.addEventListener("click", function () {
+
+        form.submit();
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

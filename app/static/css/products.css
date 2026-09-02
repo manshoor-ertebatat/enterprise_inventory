@@ -1,0 +1,85 @@
+/* =====================================================
+   Manshoor ERP
+   Products Page
+===================================================== */
+
+.table-responsive{
+    border-radius:18px;
+    overflow:hidden;
+}
+
+.table tbody tr td:first-child{
+    font-weight:700;
+    color:#334155;
+}
+
+.table tbody td .btn{
+    margin:2px;
+}
+
+.table tbody td .badge{
+    min-width:72px;
+    text-align:center;
+}
+
+.card-ui form label{
+    font-size:14px;
+    font-weight:700;
+    color:#475569;
+    margin-bottom:8px;
+}
+
+.card-ui form .btn{
+    min-width:120px;
+}
+
+.pagination{
+    gap:8px;
+}
+
+.pagination .page-link{
+    border:none;
+    border-radius:10px;
+    min-width:44px;
+    text-align:center;
+    color:#2563eb;
+    box-shadow:0 3px 10px rgba(0,0,0,.05);
+}
+
+.pagination .page-item.active .page-link{
+    background:#2563eb;
+    color:#fff;
+}
+
+.pagination .page-item.disabled .page-link{
+    background:#f8fafc;
+    color:#94a3b8;
+}
+
+/* عملیات جدول */
+
+.table td .btn-warning{
+    background:#fbbf24;
+    border-color:#fbbf24;
+    color:#111827;
+}
+
+.table td .btn-danger{
+    background:#ef4444;
+    border-color:#ef4444;
+}
+
+.table td .btn-info{
+    background:#06b6d4;
+    border-color:#06b6d4;
+    color:#fff;
+}
+
+.table td .btn-outline-secondary{
+    border-color:#cbd5e1;
+}
+
+.table td .btn:hover{
+    transform:translateY(-2px);
+    transition:.2s;
+}

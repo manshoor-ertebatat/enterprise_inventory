@@ -71,6 +71,30 @@ placeholder="شماره سریال را وارد کنید">
 <td>{{ result.timestamp|jalali }}</td>
 </tr>
 
+{% if movement %}
+
+<tr>
+    <td>مشتری</td>
+    <td>{{ result.customer_name or "-" }}</td>
+</tr>
+
+<tr>
+    <td>شماره حواله</td>
+    <td>{{ movement.id }}</td>
+</tr>
+
+<tr>
+    <td>پروژه</td>
+    <td>{{ movement.project_name or "-" }}</td>
+</tr>
+
+<tr>
+    <td>تحویل گیرنده</td>
+    <td>{{ movement.receiver_name or "-" }}</td>
+</tr>
+
+{% endif %}
+
 </table>
 
 {% endif %}

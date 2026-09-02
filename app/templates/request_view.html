@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}
+مشاهده درخواست
+{% endblock %}
+
+{% block content %}
+
+<h3>📋 مشاهده درخواست شماره {{ req.id }}</h3>
+
+<hr>
+
+<div class="card p-4 mb-4">
+
+    <div class="row">
+
+        <div class="col-md-6">
+            <b>درخواست کننده:</b><br>
+            {{ req.requester }}
+        </div>
+
+        <div class="col-md-6">
+            <b>پروژه:</b><br>
+            {{ req.project_name }}
+        </div>
+
+    </div>
+
+    <br>
+
+    <div class="row">
+
+        <div class="col-md-4">
+            <b>اولویت:</b><br>
+            {{ req.priority }}
+        </div>
+
+        <div class="col-md-4">
+            <b>وضعیت:</b><br>
+            {{ req.status }}
+        </div>
+
+        <div class="col-md-4">
+            <b>تاریخ ثبت:</b><br>
+            {{ req.created_at|shamsi }}
+        </div>
+
+    </div>
+
+    <br>
+
+    <div>
+
+        <b>توضیحات:</b>
+
+        <div class="border rounded p-2 mt-2">
+
+            {{ req.location_description or "-" }}
+
+        </div>
+
+    </div>
+
+</div>
+
+<h5>اقلام درخواست</h5>
+
+<table class="table table-bordered">
+
+    <thead>
+
+        <tr>
+
+            <th>کالا</th>
+            <th>تعداد</th>
+            <th>تحویل شده</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for item in items %}
+
+        <tr>
+
+            <td>
+
+                {{ products[item.product_id].name }}
+
+            </td>
+
+            <td>{{ item.qty }}</td>
+
+            <td>{{ item.delivered_qty }}</td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+<div class="d-flex justify-content-between mt-4">
+
+<div>
+
+    {% if req.status == "PENDING" %}
+
+        <a
+        href="/requests/edit/{{ req.id }}"
+        class="btn btn-primary">
+
+            ✏️ ویرایش
+
+        </a>
+
+        <a
+        href="/requests/delete/{{ req.id }}"
+        class="btn btn-danger"
+        onclick="return confirm('این درخواست حذف شود؟')">
+
+            🗑 حذف
+
+        </a>
+
+        <a
+        href="/requests/issue/{{ req.id }}"
+        class="btn btn-success">
+
+            📦 تحویل کالا
+
+        </a>
+
+    {% endif %}
+
+    <a
+    href="/requests/print/{{ req.id }}"
+    class="btn btn-info">
+
+        🖨 چاپ
+
+    </a>
+
+</div>
+
+<a
+href="/requests"
+class="btn btn-secondary">
+
+    بازگشت
+
+</a>
+
+</div>
+
+{% endblock %}

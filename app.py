@@ -2,7 +2,16 @@ from flask import Flask
 from app.models import db, User
 from app.routes import bp
 
-app = Flask(__name__, template_folder="app/templates")
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "app", "templates"),
+    static_folder=os.path.join(BASE_DIR, "app", "static"),
+    static_url_path="/static",
+)
 app.secret_key = "secret"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"

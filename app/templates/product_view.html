@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="mb-1">
+                <i class="bi bi-box-seam"></i>
+                {{ product.name }}
+            </h2>
+
+            <div class="text-muted">
+
+                دسته بندی :
+                {{ product.category }}
+
+                |
+
+                واحد :
+                {{ product.unit }}
+
+            </div>
+
+        </div>
+
+    <div class="d-flex gap-2">
+
+        <a href="/edit/{{ product.id }}"
+           class="btn btn-warning">
+
+            <i class="bi bi-pencil-square"></i>
+
+            ویرایش
+
+        </a>
+
+        <a href="/products"
+           class="btn btn-outline-secondary">
+
+            <i class="bi bi-arrow-right"></i>
+
+            بازگشت
+
+        </a>
+
+    </div>
+
+    </div>
+
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body text-center">
+
+                    <h6 class="text-muted">موجودی</h6>
+
+                    <h2>{{ product.qty }}</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body text-center">
+
+                    <h6 class="text-muted">ورودی کل</h6>
+
+                    <h2>{{ stock_in }}</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body text-center">
+
+                    <h6 class="text-muted">خروجی کل</h6>
+
+                    <h2>{{ stock_out }}</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body text-center">
+
+                    <h6 class="text-muted">سریال موجود</h6>
+
+                    <h2>{{ serial_in_stock }}</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="row">
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-header">
+
+                    مشخصات کالا
+
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-sm">
+
+                        <tr>
+                            <th>نام</th>
+                            <td>{{ product.name }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>دسته بندی</th>
+                            <td>{{ product.category }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>واحد</th>
+                            <td>{{ product.unit }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>حداقل موجودی</th>
+                            <td>{{ product.min_qty }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>وضعیت</th>
+                            <td>
+
+                                {% if product.is_active %}
+
+                                    <span class="badge bg-success">فعال</span>
+
+                                {% else %}
+
+                                    <span class="badge bg-danger">غیرفعال</span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <th>دارای سریال</th>
+
+                            <td>
+
+                                {% if product.has_serial %}
+
+                                    بله
+
+                                {% else %}
+
+                                    خیر
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+
+                    آخرین گردش کالا
+
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover mb-0">
+
+                        <thead>
+
+                        <tr>
+
+                            <th>تاریخ</th>
+
+                            <th>نوع</th>
+
+                            <th>تعداد</th>
+
+                            <th>پروژه</th>
+
+                            <th>تحویل گیرنده</th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                        {% for m in movements %}
+
+                        <tr>
+
+                            <td>{{ m.timestamp.strftime("%Y-%m-%d %H:%M") }}</td>
+
+                            <td>
+
+                                {% if m.type=="IN" %}
+
+                                    <span class="badge bg-success">
+                                        ورود
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-danger">
+                                        خروج
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>{{ m.qty }}</td>
+
+                            <td>{{ m.project_name }}</td>
+
+                            <td>{{ m.receiver_name }}</td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
