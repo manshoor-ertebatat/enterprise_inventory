@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}برگشت کالا از پروژه{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-1">↩️ برگشت کالا از پروژه</h3>
+            <div class="text-muted">
+                ثبت برگشت کالاهای تحویل‌شده به پروژه‌ها
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <form method="GET" action="{{ url_for('main.project_returns') }}">
+
+                <div class="row align-items-end">
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            انتخاب پروژه
+                        </label>
+
+                        <select name="project"
+                                class="form-select"
+                                onchange="this.form.submit()">
+
+                            <option value="">
+                                -- انتخاب پروژه --
+                            </option>
+
+                            {% for project in projects %}
+                                <option value="{{ project.name }}"
+                                    {% if selected_project == project.name %}
+                                        selected
+                                    {% endif %}>
+                                    {{ project.name }}
+                                </option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    {% if selected_project %}
+
+        {% if items %}
+
+            <div class="card">
+
+                <div class="card-header">
+                    <strong>
+                        کالاهای قابل برگشت از پروژه:
+                        {{ selected_project }}
+                    </strong>
+                </div>
+
+                <div class="card-body p-0">
+
+                    <div class="table-responsive">
+
+                        <table class="table table-hover align-middle mb-0">
+
+                            <thead>
+                                <tr>
+                                    <th>کالا</th>
+                                    <th>شماره خروج</th>
+                                    <th>تحویل</th>
+                                    <th>برگشت‌شده</th>
+                                    <th>قابل برگشت</th>
+                                    <th style="width: 320px;">
+                                        ثبت برگشت
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for item in items %}
+
+                                    <tr>
+
+                                        <td>
+                                            <strong>
+                                                {{ item.product.name }}
+                                            </strong>
+
+                                            {% if item.product.has_serial %}
+                                                <div class="small text-muted">
+                                                    دارای شماره سریال
+                                                </div>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            #{{ item.movement.id }}
+                                        </td>
+
+                                        <td>
+                                            {{ item.delivered }}
+                                        </td>
+
+                                        <td>
+                                            {{ item.returned }}
+                                        </td>
+
+                                        <td>
+                                            <span class="badge bg-success">
+                                                {{ item.available }}
+                                            </span>
+                                        </td>
+
+                                        <td>
+
+                                            <form method="POST"
+                                                  action="{{ url_for('main.project_returns_submit') }}"
+                                                  class="return-form">
+
+                                                <input type="hidden"
+                                                       name="movement_id"
+                                                       value="{{ item.movement.id }}">
+
+                                                <div class="mb-2">
+
+                                                    <label class="form-label small">
+                                                        تعداد برگشتی
+                                                    </label>
+
+                                                    <input type="number"
+                                                           name="qty"
+                                                           class="form-control qty-input"
+                                                           min="1"
+                                                           max="{{ item.available }}"
+                                                           value="1"
+                                                           required>
+
+                                                </div>
+
+
+                                                {% if item.product.has_serial %}
+
+                                                    <div class="mb-2">
+
+                                                        <label class="form-label small">
+                                                            انتخاب شماره سریال
+                                                        </label>
+
+                                                        {% if item.serials %}
+
+                                                            <div class="border rounded p-2"
+                                                                 style="max-height: 180px; overflow-y: auto;">
+
+                                                                {% for serial in item.serials %}
+
+                                                                    <div class="form-check">
+
+                                                                        <input class="form-check-input serial-checkbox"
+                                                                               type="checkbox"
+                                                                               name="serial_ids[]"
+                                                                               value="{{ serial.id }}">
+
+                                                                        <label class="form-check-label">
+                                                                            {{ serial.serial_number }}
+                                                                        </label>
+
+                                                                    </div>
+
+                                                                {% endfor %}
+
+                                                            </div>
+
+                                                        {% else %}
+
+                                                            <div class="alert alert-warning py-2 mb-0 small">
+                                                                برای این تحویل شماره سریال قابل برگشت پیدا نشد.
+                                                            </div>
+
+                                                        {% endif %}
+
+                                                    </div>
+
+                                                {% endif %}
+
+
+                                                <div class="mb-2">
+
+                                                    <label class="form-label small">
+                                                        علت / توضیحات
+                                                    </label>
+
+                                                    <textarea name="reason"
+                                                              class="form-control"
+                                                              rows="2"
+                                                              placeholder="اختیاری"></textarea>
+
+                                                </div>
+
+
+                                                <button type="submit"
+                                                        class="btn btn-warning btn-sm w-100">
+
+                                                    ↩️ ثبت برگشت
+
+                                                </button>
+
+                                            </form>
+
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-info">
+                برای پروژه
+                <strong>{{ selected_project }}</strong>
+                کالای قابل برگشت پیدا نشد.
+            </div>
+
+        {% endif %}
+
+    {% else %}
+
+        <div class="alert alert-secondary">
+            ابتدا یک پروژه را انتخاب کنید.
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<script>
+
+document.querySelectorAll('.return-form').forEach(function(form) {
+
+    form.addEventListener('submit', function(e) {
+
+        const qtyInput = form.querySelector('.qty-input');
+
+        if (!qtyInput) {
+            return;
+        }
+
+        const qty = parseInt(qtyInput.value || '0');
+
+        const checkboxes = form.querySelectorAll('.serial-checkbox');
+
+        if (checkboxes.length === 0) {
+            return;
+        }
+
+        const selected = form.querySelectorAll(
+            '.serial-checkbox:checked'
+        ).length;
+
+        if (selected !== qty) {
+
+            e.preventDefault();
+
+            alert(
+                'تعداد شماره سریال‌های انتخاب‌شده باید دقیقاً برابر با تعداد برگشتی باشد.'
+            );
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

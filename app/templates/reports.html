@@ -212,8 +212,6 @@ class="btn btn-dark mb-3">
 
 <td>
 
-{% if m.type == "OUT" %}
-
 <a
 href="/print-slip/{{ m.id }}"
 target="_blank"
@@ -222,6 +220,8 @@ class="btn btn-sm btn-primary">
 🖨 چاپ
 
 </a>
+
+{% if m.type == "OUT" %}
 
 {% set serial_count = movement_serial_counts.get(m.id, 0) %}
 

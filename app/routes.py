@@ -2308,3 +2308,346 @@ def add_project():
     flash("پروژه با موفقیت ثبت شد.", "success")
 
     return redirect("/projects")
+
+@bp.route('/projects/edit/<int:id>', methods=['GET', 'POST'])
+def edit_project(id):
+    if 'user' not in session:
+        return redirect('/')
+
+    if session.get('role') != 'admin':
+        return 'Access Denied'
+
+    project = Project.query.get_or_404(id)
+
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        customer = request.form.get('customer', '').strip()
+
+        if not name:
+            flash('نام پروژه وارد نشده است.', 'danger')
+            return redirect(f'/projects/edit/{id}')
+
+        exists = Project.query.filter(
+            Project.name == name,
+            Project.id != id
+        ).first()
+
+        if exists:
+            flash('پروژه دیگری با این نام وجود دارد.', 'warning')
+            return redirect(f'/projects/edit/{id}')
+
+        project.name = name
+        project.customer = customer
+
+        db.session.commit()
+
+        flash('پروژه با موفقیت ویرایش شد.', 'success')
+        return redirect('/projects')
+
+    return render_template(
+        'project_edit.html',
+        project=project
+    )
+
+
+@bp.route('/projects/delete/<int:id>')
+def delete_project(id):
+    if 'user' not in session:
+        return redirect('/')
+
+    if session.get('role') != 'admin':
+        return 'Access Denied'
+
+    project = Project.query.get_or_404(id)
+
+    used_in_requests = MaterialRequest.query.filter_by(
+        project_name=project.name
+    ).first()
+
+    used_in_movements = Movement.query.filter_by(
+        project_name=project.name
+    ).first()
+
+    if used_in_requests or used_in_movements:
+        flash(
+            'این پروژه در سوابق سیستم استفاده شده و قابل حذف نیست. آن را غیرفعال کنید.',
+            'warning'
+        )
+        return redirect('/projects')
+
+    db.session.delete(project)
+    db.session.commit()
+
+    flash('پروژه با موفقیت حذف شد.', 'success')
+    return redirect('/projects')
+
+
+@bp.route('/projects/toggle-active/<int:id>')
+def toggle_project_active(id):
+    if 'user' not in session:
+        return redirect('/')
+
+    if session.get('role') != 'admin':
+        return 'Access Denied'
+
+    project = Project.query.get_or_404(id)
+
+    project.is_active = 0 if project.is_active else 1
+
+    db.session.commit()
+
+    if project.is_active:
+        flash('پروژه فعال شد.', 'success')
+    else:
+        flash('پروژه غیرفعال شد.', 'warning')
+
+    return redirect('/projects')
+
+@bp.route("/project-returns")
+def project_returns():
+
+    if "user" not in session:
+        return redirect("/")
+
+    projects = (
+        Project.query
+        .filter_by(is_active=1)
+        .order_by(Project.name)
+        .all()
+    )
+
+    selected_project = request.args.get("project", "").strip()
+
+    items = []
+
+    if selected_project:
+
+        movements = (
+            Movement.query
+            .filter(
+                Movement.type == "OUT",
+                Movement.project_name == selected_project
+            )
+            .order_by(Movement.timestamp.desc())
+            .all()
+        )
+
+        for movement in movements:
+
+            product = Product.query.get(movement.product_id)
+
+            if not product:
+                continue
+
+            delivered = movement.qty or 0
+
+            returned = (
+                db.session.query(
+                    db.func.coalesce(
+                        db.func.sum(ProjectReturn.qty), 0
+                    )
+                )
+                .filter(
+                    ProjectReturn.movement_id == movement.id
+                )
+                .scalar()
+            ) or 0
+
+            available = delivered - returned
+
+            if available <= 0:
+                continue
+
+            serials = []
+
+            if product.has_serial:
+
+                serials = (
+                    ProductSerial.query
+                    .filter(
+                        ProductSerial.product_id == product.id,
+                        ProductSerial.status == "OUT",
+                        ProductSerial.movement_id == movement.id
+                    )
+                    .order_by(ProductSerial.serial_number.asc())
+                    .all()
+                )
+
+            items.append({
+                "movement": movement,
+                "product": product,
+                "delivered": delivered,
+                "returned": returned,
+                "available": available,
+                "serials": serials
+            })
+
+    return render_template(
+        "project_returns.html",
+        projects=projects,
+        selected_project=selected_project,
+        items=items
+    )
+
+
+@bp.route("/project-returns", methods=["POST"])
+def project_returns_submit():
+
+    if "user" not in session:
+        return redirect("/")
+
+    movement_id_raw = request.form.get("movement_id")
+    qty_raw = normalize_digits(
+        request.form.get("qty", "0")
+    )
+    reason = request.form.get("reason", "").strip()
+
+    try:
+        movement_id = int(movement_id_raw)
+        qty = int(qty_raw)
+    except (ValueError, TypeError):
+        flash("اطلاعات برگشت کالا نامعتبر است.", "danger")
+        return redirect("/project-returns")
+
+    if qty <= 0:
+        flash("تعداد برگشتی باید بیشتر از صفر باشد.", "danger")
+        return redirect("/project-returns")
+
+    movement = Movement.query.get_or_404(movement_id)
+
+    if movement.type != "OUT":
+        flash("این رکورد یک تحویل خروجی معتبر نیست.", "danger")
+        return redirect("/project-returns")
+
+    if not movement.project_name:
+        flash("این تحویل به پروژه مشخصی متصل نیست.", "danger")
+        return redirect("/project-returns")
+
+    product = Product.query.get_or_404(movement.product_id)
+
+    delivered = movement.qty or 0
+
+    returned = (
+        db.session.query(
+            db.func.coalesce(
+                db.func.sum(ProjectReturn.qty), 0
+            )
+        )
+        .filter(
+            ProjectReturn.movement_id == movement.id
+        )
+        .scalar()
+    ) or 0
+
+    available = delivered - returned
+
+    if qty > available:
+        flash(
+            f"حداکثر تعداد قابل برگشت برای «{product.name}» "
+            f"{available} عدد است.",
+            "danger"
+        )
+        return redirect(
+            f"/project-returns?project={movement.project_name}"
+        )
+
+    serials = []
+
+    if product.has_serial:
+
+        serial_ids = request.form.getlist("serial_ids[]")
+
+        if len(serial_ids) != qty:
+            flash(
+                f"برای کالای «{product.name}» باید دقیقاً "
+                f"{qty} شماره سریال انتخاب شود.",
+                "danger"
+            )
+            return redirect(
+                f"/project-returns?project={movement.project_name}"
+            )
+
+        if len(set(serial_ids)) != len(serial_ids):
+            flash(
+                "شماره سریال تکراری انتخاب شده است.",
+                "danger"
+            )
+            return redirect(
+                f"/project-returns?project={movement.project_name}"
+            )
+
+        for serial_id_raw in serial_ids:
+
+            try:
+                serial_id = int(serial_id_raw)
+            except (ValueError, TypeError):
+                flash(
+                    "شماره سریال انتخاب‌شده نامعتبر است.",
+                    "danger"
+                )
+                return redirect(
+                    f"/project-returns?project={movement.project_name}"
+                )
+
+            serial = ProductSerial.query.get(serial_id)
+
+            if (
+                not serial
+                or serial.product_id != product.id
+                or serial.status != "OUT"
+                or serial.movement_id != movement.id
+            ):
+                flash(
+                    "یکی از شماره سریال‌های انتخاب‌شده "
+                    "مربوط به این تحویل نیست.",
+                    "danger"
+                )
+                return redirect(
+                    f"/project-returns?project={movement.project_name}"
+                )
+
+            serials.append(serial)
+
+    product.qty += qty
+
+    return_movement = Movement(
+        product_id=product.id,
+        type="IN",
+        qty=qty,
+        project_name=movement.project_name,
+        description=(
+            f"برگشت کالا از پروژه - خروج شماره {movement.id}"
+            + (f" - {reason}" if reason else "")
+        ),
+        created_by=session["user"]
+    )
+
+    db.session.add(return_movement)
+
+    project_return = ProjectReturn(
+        movement_id=movement.id,
+        slip_item_id=None,
+        qty=qty,
+        reason=reason,
+        created_by=session["user"]
+    )
+
+    db.session.add(project_return)
+
+    db.session.flush()
+
+    for serial in serials:
+        serial.status = "IN_STOCK"
+        serial.movement_id = return_movement.id
+        serial.customer_name = None
+
+    db.session.commit()
+
+    flash(
+        f"{qty} عدد «{product.name}» با موفقیت به انبار برگشت داده شد.",
+        "success"
+    )
+
+    return redirect(
+        f"/project-returns?project={movement.project_name}"
+    )

@@ -212,6 +212,10 @@ placeholder="نام کارفرما">
 
                             </a>
 
+                            <a href="/projects/toggle-active/{{ p.id }}" class="btn btn-sm {% if p.is_active %}btn-secondary{% else %}btn-success{% endif %}" title="تغییر وضعیت پروژه">
+                                <i class="bi {% if p.is_active %}bi-toggle-on{% else %}bi-toggle-off{% endif %}"></i>
+                            </a>
+
                         </div>
 
                     </td>

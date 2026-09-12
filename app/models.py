@@ -335,6 +335,8 @@ class ProjectReturn(db.Model):
 
     slip_item_id = db.Column(db.Integer)
 
+    movement_id = db.Column(db.Integer)
+
     qty = db.Column(db.Integer)
 
     reason = db.Column(
