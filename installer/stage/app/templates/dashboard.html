@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}داشبورد{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-page container-fluid">
+
+    <!-- Hero -->
+    {% include "includes/dashboard/hero.html" %}
+
+    <!-- Statistics -->
+    {% include "includes/dashboard/stat_cards.html" %}
+
+    <!-- Charts + Activity -->
+    <div class="row g-4 mt-1">
+
+        <div class="col-lg-8">
+            {% include "includes/dashboard/chart.html" %}
+        </div>
+
+        <div class="col-lg-4">
+            {% include "includes/dashboard/activity.html" %}
+        </div>
+
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="row g-4 mt-1">
+
+        <div class="col-lg-6">
+            {% include "includes/dashboard/low_stock.html" %}
+        </div>
+
+        <div class="col-lg-6">
+            {% include "includes/dashboard/recent_requests.html" %}
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

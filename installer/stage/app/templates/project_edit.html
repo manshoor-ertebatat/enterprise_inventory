@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% from "components/ui.html" import breadcrumb %}
+
+{% block title %}
+ویرایش پروژه
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        {{ breadcrumb([
+            "داشبورد",
+            "پروژه‌ها",
+            "ویرایش پروژه"
+        ]) }}
+    </div>
+
+    <div class="text-end">
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-pencil-square text-warning"></i>
+            ویرایش پروژه
+        </h2>
+
+        <div class="text-muted">
+            ویرایش اطلاعات پروژه
+        </div>
+    </div>
+
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="card-ui">
+
+    <div class="p-4">
+
+        <h5 class="fw-bold mb-4">
+            اطلاعات پروژه
+        </h5>
+
+        <form method="POST">
+
+            <div class="row g-3">
+
+                <div class="col-lg-6">
+
+                    <label class="form-label">
+                        نام پروژه
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="name"
+                        value="{{ project.name }}"
+                        required>
+
+                </div>
+
+                <div class="col-lg-6">
+
+                    <label class="form-label">
+                        کارفرما
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="customer"
+                        value="{{ project.customer or '' }}">
+
+                </div>
+
+            </div>
+
+            <div class="mt-4 d-flex gap-2 justify-content-end">
+
+                <button
+                    type="submit"
+                    class="btn btn-success">
+
+                    <i class="bi bi-check-circle"></i>
+                    ذخیره تغییرات
+
+                </button>
+
+                <a
+                    href="/projects"
+                    class="btn btn-outline-secondary">
+
+                    <i class="bi bi-arrow-right"></i>
+                    انصراف
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

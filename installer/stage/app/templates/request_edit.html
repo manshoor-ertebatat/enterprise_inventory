@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}
+ویرایش درخواست
+{% endblock %}
+
+{% block content %}
+
+<h3>✏️ ویرایش درخواست شماره {{ req.id }}</h3>
+
+<hr>
+
+<form method="POST" action="/requests/update/{{ req.id }}">
+
+<div class="card p-4">
+
+    <div class="mb-3">
+
+        <label class="form-label">
+            پروژه
+        </label>
+
+        <select
+            name="project_name"
+            class="form-select">
+
+            {% for p in projects %}
+
+            <option
+                value="{{ p.name }}"
+                {% if p.name == req.project_name %}selected{% endif %}>
+
+                {{ p.name }}
+
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label class="form-label">
+            اولویت
+        </label>
+
+        <select
+            name="priority"
+            class="form-select">
+
+            <option value="عادی"
+                {% if req.priority=="عادی" %}selected{% endif %}>
+                عادی
+            </option>
+
+            <option value="فوری"
+                {% if req.priority=="فوری" %}selected{% endif %}>
+                فوری
+            </option>
+
+            <option value="خیلی فوری"
+                {% if req.priority=="خیلی فوری" %}selected{% endif %}>
+                خیلی فوری
+            </option>
+
+        </select>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label class="form-label">
+            توضیحات
+        </label>
+
+        <textarea
+            name="location_description"
+            rows="4"
+            class="form-control">{{ req.location_description }}</textarea>
+
+    </div>
+
+<h5 class="mt-4 mb-3">اقلام درخواست</h5>
+
+<table class="table table-bordered">
+
+    <thead>
+
+        <tr>
+
+            <th width="60%">کالا</th>
+
+            <th width="20%">تعداد</th>
+
+            <th width="20%">وضعیت</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for item in items %}
+
+        <tr>
+
+            <td>
+
+                {% for p in products %}
+
+                    {% if p.id == item.product_id %}
+
+                        {{ p.name }}
+
+                    {% endif %}
+
+                {% endfor %}
+
+            </td>
+
+<td>
+
+    <input
+        type="hidden"
+        name="item_id[]"
+        value="{{ item.id }}">
+
+    <input
+        type="number"
+        name="qty[]"
+        value="{{ item.qty }}"
+        min="1"
+        class="form-control">
+
+</td>
+
+            <td>
+
+<input
+    type="checkbox"
+    name="delete_item[]"
+    value="{{ item.id }}">
+
+حذف
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+<div class="card mt-4">
+
+    <div class="card-header">
+
+        ➕ افزودن کالای جدید
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-md-8">
+
+                <label class="form-label">
+
+                    کالا
+
+                </label>
+
+                <select
+                    name="new_product_id"
+                    class="form-select">
+
+                    <option value="">
+
+                        --- انتخاب کالا ---
+
+                    </option>
+
+                    {% for p in products %}
+
+                    <option value="{{ p.id }}">
+
+                        {{ p.name }}
+                        ({{ p.qty }} عدد)
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <label class="form-label">
+
+                    تعداد
+
+                </label>
+
+                <input
+                    type="number"
+                    name="new_qty"
+                    value="1"
+                    min="1"
+                    class="form-control">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+    <hr>
+
+    <div class="d-flex justify-content-between">
+
+<button
+type="button"
+class="btn btn-outline-primary">
+
+➕ افزودن کالا
+</button>
+
+        <a
+            href="/requests/view/{{ req.id }}"
+            class="btn btn-secondary">
+
+            انصراف
+
+        </a>
+
+        <button
+            type="submit"
+            class="btn btn-success">
+
+            💾 ذخیره تغییرات
+
+        </button>
+
+    </div>
+
+</div>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,13 @@
+name: manshoor-inventory
+
+services:
+  inventory:
+    image: manshoor-inventory:v1.0.2
+    container_name: enterprise_inventory_v2
+    restart: unless-stopped
+    ports:
+      - "5003:5001"
+    volumes:
+      - ./instance:/app/instance
+      - ./backups:/app/backups
+    working_dir: /app

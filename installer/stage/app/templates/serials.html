@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+
+{% block title %}
+مدیریت سریال‌ها
+{% endblock %}
+
+{% block content %}
+
+<body class="container mt-4">
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+
+<div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+
+{{ message }}
+
+<button
+type="button"
+class="btn-close"
+data-bs-dismiss="alert">
+</button>
+
+</div>
+
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="card-ui mb-4">
+
+    <div class="p-4 d-flex justify-content-between align-items-center">
+
+        <div>
+
+            <h3 class="fw-bold mb-1">
+
+                🔢 مدیریت سریال‌ها
+
+            </h3>
+
+            <div class="text-muted">
+
+                {{ product.name }}
+
+            </div>
+
+        </div>
+
+        <span class="badge bg-primary fs-6">
+
+            {{ serials|length }} سریال
+
+        </span>
+
+    </div>
+
+</div>
+
+<div class="card-ui mb-4">
+    <div class="p-4">
+
+<div class="alert alert-info mb-3">
+
+<b>ثبت گروهی سریال</b><br>
+
+می‌توانید چند شماره سریال را با بارکدخوان یا Paste وارد کنید.
+هر سریال را در یک خط قرار دهید.
+
+</div>
+
+<form method="POST" action="/serials/bulk-add">
+
+<input
+type="hidden"
+name="product_id"
+value="{{ product.id }}">
+
+<textarea
+name="serials"
+class="form-control mb-3"
+rows="8"
+placeholder="هر شماره سریال در یک خط"
+required></textarea>
+
+<button
+class="btn btn-primary mb-3 w-100"
+type="submit">
+
+ثبت گروهی سریال‌ها
+
+</button>
+
+</form>
+
+    </div>
+
+</div>
+
+<hr>
+
+<div class="card-ui mb-4">
+    <div class="p-4">
+
+<form
+id="serial_form"
+method="POST"
+action="/serials/add"
+autocomplete="off">
+
+<input
+type="hidden"
+name="product_id"
+value="{{ product.id }}">
+
+<div class="row">
+
+<div class="col-md-8">
+
+<input
+id="serial_number"
+name="serial_number"
+class="form-control form-control-lg"
+placeholder="📷 شماره سریال را اسکن یا تایپ کنید"
+autocomplete="off"
+spellcheck="false"
+enterkeyhint="done"
+autofocus
+required>
+
+<div class="form-text mt-2">
+
+اسکن کنید و Enter بزنید.
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<button
+id="save_serial"
+class="btn btn-success w-100"
+type="button">
+
+💾 ثبت سریال
+
+</button>
+
+</div>
+
+</div>
+
+</form>
+
+    </div>
+
+</div>
+
+<div
+id="serial_counter"
+class="alert alert-info mt-3">
+
+تعداد سریال‌های ثبت‌شده:
+<b>{{ serials|length }}</b>
+
+</div>
+
+<hr>
+
+<div class="card-ui">
+
+    <div class="p-4">
+
+        <div class="table-responsive">
+
+<table class="table table-bordered">
+
+<tr>
+<th>ردیف</th>
+<th>سریال</th>
+<th>وضعیت</th>
+<th>مشتری</th>
+<th>شماره حواله</th>
+<th>عملیات</th>
+</tr>
+
+{% for s in serials %}
+
+<tr>
+
+<td>{{ loop.index }}</td>
+
+<td>{{ s.serial_number }}</td>
+
+<td>
+
+{% if s.status == "IN_STOCK" %}
+
+<span class="badge bg-success">
+موجود در انبار
+</span>
+
+{% else %}
+
+<span class="badge bg-danger">
+تحویل شده
+</span>
+
+{% endif %}
+
+</td>
+
+<td>{{ s.customer_name or "-" }}</td>
+
+<td>
+{% if s.movement_id %}
+<a href="/print-slip/{{ s.movement_id }}" target="_blank">
+حواله {{ s.movement_id }}
+</a>
+{% else %}
+-
+{% endif %}
+</td>
+
+<td>
+
+{% if s.status == "IN_STOCK" %}
+
+<form method="POST" action="/serials/deliver/{{ s.id }}">
+
+<select
+name="movement_id"
+class="form-select mb-1"
+required>
+
+<option value="">
+انتخاب حواله خروج
+</option>
+
+{% for m in out_movements %}
+
+{% if movement_serial_counts.get(m.id, 0) < m.qty %}
+
+<option value="{{ m.id }}">
+حواله {{ m.id }} - {{ m.customer_name or "بدون مشتری" }} - تعداد {{ m.qty }} - ثبت سریال {{ movement_serial_counts.get(m.id, 0) }} - باقی‌مانده {{ m.qty - movement_serial_counts.get(m.id, 0) }}
+</option>
+
+{% endif %}
+
+{% endfor %}
+
+</select>
+
+<button class="btn btn-success btn-sm">
+تحویل
+</button>
+
+</form>
+
+{% if session["role"] == "admin" %}
+
+<a
+href="/serials/delete/{{ s.id }}"
+class="btn btn-danger btn-sm mt-1"
+onclick="return confirm('آیا از حذف این سریال مطمئن هستید؟')">
+
+حذف سریال
+
+</a>
+
+{% endif %}
+
+{% else %}
+
+<span class="text-success">
+تحویل شده
+</span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<a href="/dashboard" class="btn btn-secondary">
+بازگشت
+</a>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("serial_form");
+    const serial = document.getElementById("serial_number");
+    const save = document.getElementById("save_serial");
+
+    serial.focus();
+
+    serial.addEventListener("keydown", function (e) {
+
+        if (e.key === "Enter") {
+
+            e.preventDefault();
+            form.submit();
+
+        }
+
+    });
+
+    save.addEventListener("click", function () {
+
+        form.submit();
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

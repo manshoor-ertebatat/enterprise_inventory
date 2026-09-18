@@ -1,0 +1,151 @@
+{% if session.get("role") != "viewer" %}
+<div class="card-ui mb-4">
+
+    <div class="p-4">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+                <h4 class="mb-1">
+
+                    <i class="bi bi-plus-circle text-success"></i>
+
+                    افزودن کالای جدید
+
+                </h4>
+
+                <small class="text-muted">
+
+                    برای ثبت کالای جدید روی دکمه زیر کلیک کنید.
+
+                </small>
+
+            </div>
+
+            <button
+                class="btn btn-success"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#addProductForm">
+
+                <i class="bi bi-plus-lg"></i>
+
+                افزودن کالا
+
+            </button>
+
+        </div>
+
+        <div class="collapse mt-4" id="addProductForm">
+
+            <form method="POST" action="/add">
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <label class="form-label">نام کالا</label>
+                        <input type="text"
+                               name="name"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">موجودی اولیه</label>
+                        <input type="number"
+                               name="qty"
+                               value="0"
+                               min="0"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">حداقل موجودی</label>
+                        <input type="number"
+                               name="min_qty"
+                               value="5"
+                               min="0"
+                               class="form-control">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">واحد</label>
+                        <input type="text"
+                               name="unit"
+                               value="عدد"
+                               class="form-control">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">وضعیت</label>
+
+                        <select
+                            name="condition"
+                            class="form-select">
+
+                            <option value="نو">نو</option>
+                            <option value="دست دوم">دست دوم</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+
+                            دسته‌بندی
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="category"
+                            class="form-control"
+                            placeholder="مثلاً دوربین">
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+
+                            دارای شماره سریال
+
+                        </label>
+
+                        <select
+                            name="has_serial"
+                            class="form-select">
+
+                            <option value="0" selected>خیر</option>
+                            <option value="1">بله</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-5 d-flex align-items-end justify-content-end">
+
+                        <button class="btn btn-success">
+
+                            <i class="bi bi-check-circle"></i>
+
+                            ثبت کالا
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+{% endif %}

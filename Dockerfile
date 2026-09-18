@@ -1,9 +1,7 @@
-FROM python:3.11-slim
+FROM manshoor-inventory:v1.0.0
 
 WORKDIR /app
 
-COPY . .
-
-RUN pip install -r requirements.txt
+COPY app ./app
 
 CMD ["python", "app.py"]

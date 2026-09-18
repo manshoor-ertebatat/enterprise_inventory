@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}
+تحویل کالا
+{% endblock %}
+
+{% block content %}
+
+<h3>📦 تحویل درخواست شماره {{ req.id }}</h3>
+
+<hr>
+
+<div class="card p-4">
+
+<form
+    id="issue-form"
+    method="POST"
+    action="/requests/issue/{{ req.id }}">
+
+    <table class="table table-bordered table-striped">
+
+        <thead>
+
+            <tr>
+
+                <th>کالا</th>
+                <th>تعداد درخواست</th>
+                <th>موجودی انبار</th>
+                <th>وضعیت</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for item in items %}
+
+{% if products[item.product_id].has_serial %}
+
+<tr>
+
+<td colspan="4">
+
+<div
+class="border rounded p-3 bg-light"
+data-needed="{{ item.qty }}">
+
+<label class="fw-bold mb-2">
+
+شماره سریال‌های کالا
+{{ products[item.product_id].name }}
+
+(تعداد مورد نیاز: {{ item.qty }})
+
+</label>
+
+<input
+type="text"
+class="form-control serial-scanner mb-3"
+data-product="{{ item.product_id }}"
+placeholder="📷 سریال را اسکن کنید و Enter بزنید">
+
+<div class="row">
+
+{% for s in available_serials[item.product_id] %}
+
+<div class="col-md-4">
+
+<div class="form-check">
+
+<input
+class="form-check-input serial-checkbox"
+type="checkbox"
+name="serial_ids_{{ item.product_id }}[]"
+value="{{ s.id }}"
+form="issue-form"
+data-product="{{ item.product_id }}"
+data-serial="{{ s.serial_number }}">
+
+<label class="form-check-label">
+
+{{ s.serial_number }}
+
+</label>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</td>
+
+</tr>
+
+{% endif %}
+
+<tr>
+
+    <td>{{ products[item.product_id].name }}</td>
+
+    <td>{{ item.qty }}</td>
+
+    <td>{{ products[item.product_id].qty }}</td>
+
+    <td>
+
+        {% if products[item.product_id].qty >= item.qty %}
+
+            <span class="badge bg-success">
+                ✅ موجودی کافی
+            </span>
+
+        {% else %}
+
+            <span class="badge bg-danger">
+                ❌ کمبود موجودی
+            </span>
+
+        {% endif %}
+
+    </td>
+
+</tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    <div class="mt-3">
+
+<div class="d-flex justify-content-between mt-4">
+
+    <a
+        href="/requests/view/{{ req.id }}"
+        class="btn btn-secondary">
+
+        بازگشت
+
+    </a>
+
+    {% set ns = namespace(can_issue=True) %}
+
+    {% for item in items %}
+
+        {% if products[item.product_id].qty < item.qty %}
+            {% set ns.can_issue = False %}
+        {% endif %}
+
+    {% endfor %}
+
+    {% if ns.can_issue %}
+
+<button
+    type="submit"
+    class="btn btn-success">
+
+    📦 ثبت تحویل
+
+</button>
+
+    {% else %}
+
+        <button
+            class="btn btn-danger"
+            disabled>
+
+            ❌ امکان تحویل وجود ندارد
+
+        </button>
+
+    {% endif %}
+
+</div>
+
+    </div>
+
+</form>
+
+</div>
+
+<script>
+
+document.querySelectorAll(".serial-scanner").forEach(function(input){
+
+    input.addEventListener("keydown", function(e){
+
+        if(e.key !== "Enter") return;
+
+        e.preventDefault();
+
+        const serial = this.value.trim();
+
+        if(!serial) return;
+
+        const product = this.dataset.product;
+
+        const checkbox = document.querySelector(
+            '.serial-checkbox[data-product="' +
+            product +
+            '"][data-serial="' +
+            serial +
+            '"]'
+        );
+
+        if(checkbox){
+
+            checkbox.checked = true;
+            checkbox.scrollIntoView({
+                behavior:"smooth",
+                block:"center"
+            });
+
+            this.value="";
+
+        }else{
+
+            alert("این شماره سریال در انبار موجود نیست.");
+
+        }
+
+    });
+
+});
+
+
+
+document.getElementById("issue-form")
+.addEventListener("submit", function(e){
+
+    let ok = true;
+
+    document.querySelectorAll(".serial-scanner").forEach(function(scanner){
+
+        const product = scanner.dataset.product;
+
+        const needed = parseInt(
+            scanner.closest(".border").dataset.needed
+        );
+        const selected = document.querySelectorAll(
+            '.serial-checkbox[data-product="' +
+            product +
+            '"]:checked'
+        ).length;
+
+        if(selected !== needed){
+
+            ok = false;
+
+            alert(
+                "برای این کالا باید دقیقاً "
+                + needed +
+                " شماره سریال انتخاب شود."
+            );
+
+        }
+
+    });
+
+    if(!ok){
+
+        e.preventDefault();
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

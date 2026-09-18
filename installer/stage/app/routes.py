@@ -1105,48 +1105,10 @@ def backup_database():
     if session.get("role") != "admin":
         return "Access Denied"
 
-    backup_dir = "/app/backups"
-    os.makedirs(backup_dir, exist_ok=True)
-
-    backups = []
-
-    for filename in sorted(
-        os.listdir(backup_dir),
-        reverse=True
-    ):
-        if filename.endswith(".db"):
-            backup_path = os.path.join(
-                backup_dir,
-                filename
-            )
-
-            backups.append({
-                "filename": filename,
-                "size": os.path.getsize(backup_path),
-                "modified": datetime.fromtimestamp(
-                    os.path.getmtime(backup_path)
-                )
-            })
-
-    return render_template(
-        "backup.html",
-        backups=backups
-    )
-
-
-@bp.route("/backup/create")
-def create_backup():
-
-    if "user" not in session:
-        return redirect("/")
-
-    if session.get("role") != "admin":
-        return "Access Denied"
-
     from datetime import datetime
     import shutil
 
-    backup_dir = "/app/backups"
+    backup_dir = "/app/instance/backups"
     os.makedirs(backup_dir, exist_ok=True)
 
     filename = (
@@ -1171,84 +1133,11 @@ def create_backup():
         f"تهیه نسخه پشتیبان: {filename}"
     )
 
-    flash(
-        f"نسخه پشتیبان با موفقیت ایجاد شد: {filename}",
-        "success"
-    )
-
-    return redirect("/backup")
-
-@bp.route("/backup/download/<path:filename>")
-def download_backup(filename):
-
-    if "user" not in session:
-        return redirect("/")
-
-    if session.get("role") != "admin":
-        return "Access Denied"
-
-    from flask import abort
-    from werkzeug.utils import safe_join
-
-    backup_dir = "/app/backups"
-
-    backup_path = safe_join(
-        backup_dir,
-        filename
-    )
-
-    if not backup_path or not os.path.isfile(backup_path):
-        abort(404)
-
     return send_file(
         backup_path,
         as_attachment=True,
-        download_name=os.path.basename(backup_path)
+        download_name=filename
     )
-
-@bp.route("/backup/emergency", methods=["POST"])
-def emergency_backup():
-
-    if "user" not in session:
-        return redirect("/")
-
-    if session.get("role") != "admin":
-        return "Access Denied"
-
-    from datetime import datetime
-    import shutil
-
-    backup_dir = "/app/backups"
-    os.makedirs(backup_dir, exist_ok=True)
-
-    filename = (
-        "emergency_backup_"
-        + datetime.now().strftime("%Y-%m-%d_%H%M%S")
-        + ".db"
-    )
-
-    backup_path = os.path.join(
-        backup_dir,
-        filename
-    )
-
-    shutil.copy2(
-        "/app/instance/data.db",
-        backup_path
-    )
-
-    log_activity(
-        session["user"],
-        "EMERGENCY_BACKUP",
-        f"تهیه نسخه پشتیبان اضطراری: {filename}"
-    )
-
-    flash(
-        f"نسخه پشتیبان اضطراری ایجاد شد: {filename}",
-        "success"
-    )
-
-    return redirect("/backup")
 
 @bp.route("/activity-log")
 def activity_log():

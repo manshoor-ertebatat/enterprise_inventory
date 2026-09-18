@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+
+<head>
+<meta charset="UTF-8">
+<title>حواله خروج کالا</title>
+
+<style>
+
+body{
+    font-family:tahoma;
+    padding:40px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+td{
+    border:1px solid #000;
+    padding:10px;
+}
+
+.print-btn{
+    margin-top:20px;
+}
+
+@media print{
+    .print-btn{
+        display:none;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2 style="text-align:center">
+شرکت فنی مهندسی منشور ارتباطات
+</h2>
+
+<h3 style="text-align:center">
+حواله خروج کالا
+</h3>
+
+<table>
+
+<tr>
+<td>شماره حواله</td>
+<td>{{ movement.id }}</td>
+</tr>
+
+<tr>
+<td>تاریخ</td>
+<td>{{ movement.timestamp|jalali }}</td>
+</tr>
+
+<tr>
+<td>نام کالا</td>
+<td>{{ product.name }}</td>
+</tr>
+
+<tr>
+<td>تعداد</td>
+<td>{{ movement.qty }} {{ product.unit or "عدد" }}</td>
+</tr>
+
+<tr>
+<td>تحویل گیرنده</td>
+<td>{{ movement.receiver_name }}</td>
+</tr>
+
+<tr>
+<td>مشتری مقصد</td>
+<td>{{ movement.customer_name }}</td>
+</tr>
+
+<tr>
+<td>توضیحات</td>
+<td>{{ movement.description }}</td>
+</tr>
+
+{% if serials %}
+
+<tr>
+<td>سریال‌های تحویلی</td>
+
+<td>
+{% for serial in serials %}
+
+{{ serial.serial_number }}<br>
+
+{% endfor %}
+</td>
+</tr>
+
+{% endif %}
+
+<tr>
+<td>ثبت کننده</td>
+<td>{{ movement.created_by }}</td>
+</tr>
+
+</table>
+
+<br><br><br>
+
+<table>
+
+<tr>
+<td style="height:80px;text-align:center">
+امضاء انباردار
+</td>
+
+<td style="height:80px;text-align:center">
+امضاء تحویل گیرنده
+</td>
+</tr>
+
+</table>
+
+<button
+class="print-btn"
+onclick="window.print()">
+🖨 چاپ
+</button>
+
+</body>
+</html>

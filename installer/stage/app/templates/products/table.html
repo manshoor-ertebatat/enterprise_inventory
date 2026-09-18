@@ -1,0 +1,364 @@
+<div class="card-ui">
+
+    <div class="p-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <h4 class="fw-bold mb-0">
+
+                <i class="bi bi-box-seam text-primary"></i>
+
+                لیست کالاها
+
+            </h4>
+
+            <span class="badge rounded-pill bg-primary-subtle text-primary px-3 py-2">
+
+                  {{ pagination.total }} کالا
+
+            </span>
+     
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th width="60" class="text-center">ردیف</th>
+                        <th width="70">شناسه</th>
+
+                        <th>نام کالا</th>
+                        <th>دسته‌بندی</th>
+                        <th>وضعیت</th>
+                        <th class="text-center">موجودی</th>
+                        <th class="text-center">حداقل</th>
+                        <th class="text-center">سریال</th>
+                        <th class="text-center">فعال</th>
+                        <th width="320" class="text-center">عملیات</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for product in products %}
+
+                    <tr>
+
+                        <td class="text-center">
+
+                            {{ loop.index + ((pagination.page - 1) * pagination.per_page) }}
+
+                        </td>
+
+                        <td>
+
+                            <strong>{{ product.id }}</strong>
+
+                        </td>
+
+                        <td>
+
+                            <strong>{{ product.name }}</strong><br>
+
+                            <small class="text-muted">
+
+                                واحد: {{ product.unit }}
+
+                            </small>
+
+                        </td>
+
+                        <td>
+
+                            <span class="badge bg-secondary">
+
+                                {{ product.category }}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            {% if product.condition=="نو" %}
+
+                                <span class="badge bg-success">
+
+                                    نو
+
+                                </span>
+
+                            {% elif product.condition=="دست دوم" %}
+
+                                <span class="badge bg-warning text-dark">
+
+                                    دست دوم
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-secondary">
+
+                                    {{ product.condition }}
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td class="text-center">
+
+                            {% if product.qty==0 %}
+
+                                <span class="badge bg-danger">
+
+                                    {{ product.qty }}
+
+                                </span>
+
+                            {% elif product.qty <= product.min_qty %}
+
+                                <span class="badge bg-warning text-dark">
+
+                                    {{ product.qty }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-success">
+
+                                    {{ product.qty }}
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td class="text-center">
+
+                            {{ product.min_qty }}
+
+                        </td>
+
+                        <td class="text-center">
+
+                            {% if product.has_serial %}
+
+                                <span class="badge bg-info">
+
+                                    {{ serial_counts.get(product.id,0) }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-muted">
+
+                                    —
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td class="text-center">
+
+                            {% if product.is_active %}
+
+                                <span class="badge bg-success">
+
+                                    فعال
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-danger">
+
+                                    غیرفعال
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                                <a
+    href="/product/{{ product.id }}"
+    class="btn btn-outline-primary btn-sm"
+    title="مشاهده">
+
+    <i class="bi bi-eye"></i>
+
+</a>
+
+{% if session.get("role") != "viewer" %}
+
+<a
+    href="/edit/{{ product.id }}"
+    class="btn btn-outline-warning btn-sm"
+    title="ویرایش">
+
+    <i class="bi bi-pencil"></i>
+
+</a>
+
+{% if product.has_serial %}
+
+<a
+    href="/serials/{{ product.id }}"
+    class="btn btn-outline-info btn-sm"
+    title="مدیریت سریال">
+
+    <i class="bi bi-upc-scan"></i>
+
+</a>
+
+{% endif %}
+
+<a
+    href="/product-toggle-active/{{ product.id }}"
+    class="btn btn-sm {% if product.is_active %}btn-outline-secondary{% else %}btn-outline-success{% endif %}"
+    title="{% if product.is_active %}غیرفعال کردن{% else %}فعال کردن{% endif %}">
+
+    {% if product.is_active %}
+        <i class="bi bi-pause-circle"></i>
+    {% else %}
+        <i class="bi bi-play-circle"></i>
+    {% endif %}
+
+</a>
+
+<a
+    href="/delete/{{ product.id }}"
+    class="btn btn-outline-danger btn-sm"
+    onclick="return confirm('آیا از حذف این کالا مطمئن هستید؟')"
+    title="حذف">
+
+    <i class="bi bi-trash"></i>
+
+</a>
+
+{% endif %}
+
+</div>
+
+</td>
+
+</tr>
+
+{% else %}
+
+<tr>
+
+    <td colspan="9" class="text-center py-5 text-muted">
+
+        <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+
+        کالایی برای نمایش وجود ندارد.
+
+    </td>
+
+</tr>
+
+{% endfor %}
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% if pagination.pages > 1 %}
+
+        <nav class="mt-4">
+
+            <ul class="pagination justify-content-center">
+
+                {% if pagination.has_prev %}
+
+                <li class="page-item">
+
+                    <a class="page-link"
+                       href="{{ url_for(request.endpoint,
+                                        page=pagination.prev_num,
+                                        search=search,
+                                        category=category,
+                                        stock_status=stock_status,
+                                        condition=condition,
+                                        active=active) }}">
+                        قبلی
+                    </a>
+
+                </li>
+
+                {% endif %}
+
+                {% for page_num in pagination.iter_pages() %}
+
+                    {% if page_num %}
+
+                        <li class="page-item {% if page_num==pagination.page %}active{% endif %}">
+
+                            <a class="page-link"
+                               href="{{ url_for(request.endpoint,
+                                                page=page_num,
+                                                search=search,
+                                                category=category,
+                                                stock_status=stock_status,
+                                                condition=condition,
+                                                active=active) }}">
+
+                                {{ page_num }}
+
+                            </a>
+
+                        </li>
+
+                    {% endif %}
+
+                {% endfor %}
+
+                {% if pagination.has_next %}
+
+                <li class="page-item">
+
+                    <a class="page-link"
+                       href="{{ url_for(request.endpoint,
+                                        page=pagination.next_num,
+                                        search=search,
+                                        category=category,
+                                        stock_status=stock_status,
+                                        condition=condition,
+                                        active=active) }}">
+
+                        بعدی
+
+                    </a>
+
+                </li>
+
+                {% endif %}
+
+            </ul>
+
+        </nav>
+
+        {% endif %}
+
+    </div>
+
+</div>

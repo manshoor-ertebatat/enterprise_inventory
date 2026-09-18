@@ -1,0 +1,185 @@
+<div class="collapse mb-4" id="panelAddProduct">
+
+    <div class="erp-card">
+
+        <div class="erp-card-header">
+
+            <div>
+
+                <h3>
+
+                    <i class="bi bi-plus-circle-fill text-success"></i>
+
+                    افزودن کالای جدید
+
+                </h3>
+
+                <small>
+
+                    اطلاعات کالای جدید را وارد کنید.
+
+                </small>
+
+            </div>
+
+        </div>
+
+        <div class="erp-card-body">
+
+            <form method="POST" action="/add">
+
+                <div class="row g-4">
+
+                    <div class="col-lg-4">
+
+                        <label class="form-label">
+
+                            نام کالا
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="name"
+                            required>
+
+                    </div>
+
+                    <div class="col-lg-2">
+
+                        <label class="form-label">
+
+                            موجودی اولیه
+
+                        </label>
+
+                        <input
+                            type="number"
+                            class="form-control"
+                            name="qty"
+                            value="0"
+                            min="0"
+                            required>
+
+                    </div>
+
+                    <div class="col-lg-2">
+
+                        <label class="form-label">
+
+                            حداقل موجودی
+
+                        </label>
+
+                        <input
+                            type="number"
+                            class="form-control"
+                            name="min_qty"
+                            value="5"
+                            min="0">
+
+                    </div>
+
+                    <div class="col-lg-2">
+
+                        <label class="form-label">
+
+                            واحد
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="unit"
+                            value="عدد">
+
+                    </div>
+
+                    <div class="col-lg-2">
+
+                        <label class="form-label">
+
+                            وضعیت
+
+                        </label>
+
+                        <select
+                            class="form-select"
+                            name="condition">
+
+                            <option value="نو">نو</option>
+
+                            <option value="دست دوم">دست دوم</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-lg-6">
+
+                        <label class="form-label">
+
+                            دسته‌بندی
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="category"
+                            placeholder="مثلاً دوربین مداربسته">
+
+                    </div>
+
+                    <div class="col-lg-3">
+
+                        <label class="form-label">
+
+                            دارای شماره سریال
+
+                        </label>
+
+                        <select
+                            class="form-select"
+                            name="has_serial">
+
+                            <option value="0">
+
+                                خیر
+
+                            </option>
+
+                            <option value="1">
+
+                                بله
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-lg-3 d-flex align-items-end">
+
+                        <button
+                            class="btn btn-success w-100">
+
+                            <i class="bi bi-check-circle"></i>
+
+                            ثبت کالا
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}
+مدیریت کالاها
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    {% include "products/header.html" %}
+
+    {% if session.get("role") != "viewer" %}
+        {% include "products/action_bar.html" %}
+    {% endif %}
+
+    {% if session.get("role") != "viewer" %}
+
+        {% include "products/add_product.html" %}
+
+        {% include "products/stock_in.html" %}
+
+        {% include "products/stock_out.html" %}
+
+    {% endif %}
+
+    {% include "includes/product_filters.html" %}
+
+    {% include "products/table.html" %}
+
+</div>
+
+{% endblock %}

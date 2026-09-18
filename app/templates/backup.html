@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}پشتیبان‌گیری و بازیابی{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="bi bi-database-fill"></i>
+                پشتیبان‌گیری و بازیابی
+            </h2>
+            <div class="text-muted">
+                مدیریت نسخه‌های پشتیبان سیستم انبارداری
+            </div>
+        </div>
+
+        <a href="/dashboard" class="btn btn-secondary">
+            <i class="bi bi-arrow-right"></i>
+            بازگشت به داشبورد
+        </a>
+    </div>
+
+
+    <!-- وضعیت -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-shield-check"></i>
+                        وضعیت پشتیبان‌گیری
+                    </h5>
+
+                    <div class="alert alert-success mb-0">
+                        <strong>سیستم پشتیبان‌گیری فعال است.</strong>
+                        <br>
+                        نسخه‌های پشتیبان در مسیر تعیین‌شده ذخیره می‌شوند.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-folder2-open"></i>
+                        مسیر پشتیبان
+                    </h5>
+
+                    <div class="input-group">
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="C:\ManshoorInventory\backups"
+                            readonly
+                        >
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            disabled
+                        >
+                            انتخاب مسیر
+                        </button>
+
+                    </div>
+
+                    <small class="text-muted d-block mt-2">
+                        امکان انتخاب مسیر ویندوز در مرحله بعد اضافه خواهد شد.
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- تهیه Backup -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <div class="row align-items-center">
+
+                <div class="col-md-8">
+
+                    <h5 class="mb-2">
+                        <i class="bi bi-cloud-arrow-down"></i>
+                        تهیه نسخه پشتیبان جدید
+                    </h5>
+
+                    <p class="text-muted mb-md-0">
+                        از اطلاعات فعلی سیستم یک نسخه پشتیبان تهیه کنید.
+                    </p>
+
+                </div>
+
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+
+                    <a
+                        href="/backup/create"
+                        class="btn btn-primary btn-lg"
+                    >
+                        <i class="bi bi-download"></i>
+                        تهیه نسخه پشتیبان
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Backup های موجود -->
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <h5 class="card-title mb-3">
+                <i class="bi bi-archive"></i>
+                نسخه‌های پشتیبان موجود
+            </h5>
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>ردیف</th>
+                            <th>نام فایل</th>
+                            <th>تاریخ</th>
+                            <th>حجم</th>
+                            <th>عملیات</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% if backups %}
+
+                            {% for backup in backups %}
+
+                             <tr>
+
+                                 <td class="text-center">
+                                     {{ loop.index }}
+                                 </td>
+
+                                 <td>
+                                     <i class="bi bi-file-earmark-database"></i>
+                                     {{ backup.filename }}
+                                 </td>
+
+                                 <td>
+                                     {{ backup.modified.strftime("%Y-%m-%d %H:%M:%S") }}
+                                 </td>
+
+                                 <td>
+                                     {{ "%.2f"|format(backup.size / 1024 / 1024) }} MB
+                                 </td>
+
+                                 <td>
+
+                                     <a
+                                         href="/backup/download/{{ backup.filename }}"
+                                         class="btn btn-sm btn-outline-primary"
+                                     >
+                                         <i class="bi bi-download"></i>
+                                         دانلود
+                                     </a>
+
+                                     <button
+                                         type="button"
+                                         class="btn btn-sm btn-outline-danger"
+                                         disabled
+                                     >
+                                         <i class="bi bi-arrow-counterclockwise"></i>
+                                         Restore
+                                     </button>
+
+                                 </td>
+
+                             </tr>
+
+                             {% endfor %}
+
+                         {% else %}
+
+                             <tr>
+
+                                 <td
+                                     colspan="5"
+                                     class="text-center text-muted py-4"
+                                 >
+                                     <i class="bi bi-archive fs-3 d-block mb-2"></i>
+                                     هنوز نسخه پشتیبانی ثبت نشده است.
+                                 </td>
+
+                             </tr>
+
+                         {% endif %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- هشدار Restore -->
+
+    <div class="alert alert-warning mt-4 shadow-sm">
+
+        <h5 class="alert-heading">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            توجه
+        </h5>
+
+        <p class="mb-0">
+            در صورت نیاز به بازیابی اطلاعات، از فایل‌های پشتیبان موجود استفاده کنید.
+            قبل از Restore، سیستم به‌صورت خودکار از اطلاعات فعلی یک نسخه پشتیبان اضطراری تهیه خواهد کرد.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

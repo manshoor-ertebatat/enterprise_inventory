@@ -1,0 +1,43 @@
+/* =====================================================
+   Manshoor ERP
+   Requests Page
+===================================================== */
+
+.table-hover tbody tr{
+    transition:.2s;
+}
+
+.table-hover tbody tr:hover{
+    background:#f8fbff !important;
+}
+
+.table-hover thead th{
+    background:#f8fafc;
+    border-bottom:2px solid #e9edf5;
+    font-weight:700;
+    padding:16px 12px;
+}
+
+.table-hover td{
+    padding:15px 12px;
+    vertical-align:middle;
+}
+
+.table-hover tbody tr:nth-child(even){
+    background:#fcfcfd;
+}
+
+.badge{
+    border-radius:20px;
+    padding:.45rem .8rem;
+    font-weight:600;
+}
+
+.btn-sm{
+    border-radius:10px;
+    width:36px;
+    height:36px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+}

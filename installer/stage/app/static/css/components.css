@@ -1,0 +1,119 @@
+
+/* =====================================================
+   ERP Components
+===================================================== */
+
+.page-title{
+    font-size:32px;
+    font-weight:800;
+    color:#0f172a;
+    margin-bottom:6px;
+}
+
+.page-subtitle{
+    color:#64748b;
+    font-size:15px;
+}
+
+.card-ui{
+    background:#fff;
+    border-radius:20px;
+    border:1px solid #eef2f7;
+    box-shadow:0 10px 30px rgba(15,23,42,.06);
+}
+
+.table{
+    margin:0;
+}
+
+.table thead th{
+    background:#f8fafc;
+    border-bottom:2px solid #e5e7eb;
+    color:#334155;
+    font-weight:700;
+    font-size:15px;
+    padding:18px 14px;
+}
+
+.table tbody td{
+    padding:18px 14px;
+    vertical-align:middle;
+}
+
+.table tbody tr{
+    transition:.25s;
+}
+
+.table tbody tr:hover{
+    background:#f8fbff;
+}
+
+.badge{
+    border-radius:10px;
+    padding:7px 12px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.btn{
+    border-radius:12px;
+    font-weight:600;
+}
+
+.btn-sm{
+    border-radius:10px;
+    padding:5px 12px;
+}
+
+.form-control,
+.form-select{
+
+    min-height:48px;
+    border-radius:12px;
+    border:1px solid #dbe2ea;
+
+}
+
+.form-control:focus,
+.form-select:focus{
+
+    border-color:#2563eb;
+    box-shadow:0 0 0 .18rem rgba(37,99,235,.12);
+
+}
+
+/* ===== Breadcrumb ===== */
+
+.breadcrumb{
+
+background:#fff;
+
+padding:12px 18px;
+
+border-radius:12px;
+
+box-shadow:var(--shadow);
+
+margin-bottom:20px;
+
+}
+
+.breadcrumb-item{
+
+font-size:14px;
+
+}
+
+.breadcrumb-item+.breadcrumb-item::before{
+
+content:"/";
+
+}
+
+.breadcrumb-item.active{
+
+font-weight:700;
+
+color:var(--primary);
+
+}

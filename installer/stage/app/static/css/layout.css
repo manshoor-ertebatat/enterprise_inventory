@@ -1,0 +1,472 @@
+/* =====================================================
+   Layout
+===================================================== */
+
+.layout{
+    display:flex;
+    min-height:100vh;
+}
+
+.content{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+}
+
+.page-content{
+    padding:24px;
+}
+
+
+/* =====================================================
+   Sidebar
+===================================================== */
+
+.sidebar{
+
+    width:280px;
+
+    background:var(--sidebar);
+
+    color:#fff;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
+    position:sticky;
+
+    top:0;
+
+    height:100vh;
+
+    transition:.28s ease;
+
+    overflow-y:auto;
+
+    overflow-x:hidden;
+
+    box-shadow:4px 0 18px rgba(0,0,0,.08);
+
+    z-index:1000;
+
+}
+
+.sidebar.collapsed{
+
+    width:86px;
+
+}
+
+.sidebar-top{
+
+    padding:18px;
+
+}
+
+.sidebar-brand{
+
+    text-align:center;
+
+    margin-bottom:22px;
+
+}
+
+.sidebar-logo-card{
+
+    width:92px;
+
+    height:92px;
+
+    margin:auto;
+
+    background:#fff;
+
+    border-radius:18px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+
+}
+
+.sidebar-logo-card img{
+
+    width:72px;
+
+}
+
+.sidebar-brand h4{
+
+    color:#fff;
+
+    margin-top:14px;
+
+    margin-bottom:2px;
+
+    font-size:18px;
+
+}
+
+.sidebar-brand span{
+
+    color:#c9d4e2;
+
+    font-size:13px;
+
+}
+
+
+/* =====================================================
+   Menu
+===================================================== */
+
+.sidebar-menu{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+.sidebar-menu a,
+.sidebar-menu summary{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:12px 14px;
+
+    border-radius:12px;
+
+    color:#d9e3ef;
+
+    cursor:pointer;
+
+    transition:.22s;
+
+}
+
+.sidebar-menu a:hover,
+.sidebar-menu summary:hover{
+
+    background:var(--sidebar-hover);
+
+    color:#fff;
+
+}
+
+.sidebar-menu a.active{
+
+    background:#2563eb;
+
+    color:#fff;
+
+    font-weight:700;
+
+}
+
+.sidebar-menu details{
+
+    border-radius:12px;
+
+}
+
+.sidebar-menu details[open]{
+
+    background:rgba(255,255,255,.04);
+
+}
+
+.sidebar-menu summary{
+
+    list-style:none;
+
+    justify-content:space-between;
+
+}
+
+.sidebar-menu summary::-webkit-details-marker{
+
+    display:none;
+
+}
+
+.sidebar-menu summary span{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.sidebar-menu details>a{
+
+    margin:5px 10px;
+
+    padding:10px 14px 10px 42px;
+
+    font-size:14px;
+
+}
+
+.sidebar-menu details>a.active{
+
+    background:#2563eb;
+
+}
+
+.sidebar-menu i{
+
+    width:22px;
+
+    text-align:center;
+
+    flex-shrink:0;
+
+}
+
+
+/* =====================================================
+   Sidebar Footer
+===================================================== */
+
+.sidebar-bottom{
+
+    padding:18px;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+}
+
+.sidebar-user{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-bottom:18px;
+
+}
+
+.sidebar-user-avatar{
+
+    font-size:34px;
+
+}
+
+.sidebar-user strong{
+
+    display:block;
+
+    color:#fff;
+
+}
+
+.sidebar-user small{
+
+    color:#cdd6e4;
+
+}
+
+.logout-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    background:#dc3545;
+
+    color:#fff;
+
+    padding:12px;
+
+    border-radius:12px;
+
+    transition:.2s;
+
+}
+
+.logout-btn:hover{
+
+    background:#bb2d3b;
+
+    color:#fff;
+
+}
+
+
+/* =====================================================
+   Topbar
+===================================================== */
+
+.topbar{
+
+    height:72px;
+
+    background:#fff;
+
+    border-bottom:1px solid var(--border);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 24px;
+
+    box-shadow:0 2px 10px rgba(0,0,0,.04);
+
+}
+
+.topbar-left,
+.topbar-center,
+.topbar-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+}
+
+.menu-btn{
+
+    border:none;
+
+    background:none;
+
+    font-size:28px;
+
+    cursor:pointer;
+
+}
+
+.company-title h5{
+
+    margin:0;
+
+}
+
+.company-title small{
+
+    color:var(--muted);
+
+}
+
+.header-logo{
+
+    height:46px;
+
+}
+
+.user-name{
+
+    font-weight:600;
+
+}
+
+
+/* =====================================================
+   Collapsed Sidebar
+===================================================== */
+
+.sidebar.collapsed .sidebar-brand h4,
+.sidebar.collapsed .sidebar-brand span,
+.sidebar.collapsed .sidebar-user,
+.sidebar.collapsed .logout-btn span,
+.sidebar.collapsed .sidebar-menu span,
+.sidebar.collapsed details>a{
+
+    display:none;
+
+}
+
+.sidebar.collapsed .sidebar-logo-card{
+
+    width:58px;
+
+    height:58px;
+
+}
+
+.sidebar.collapsed .sidebar-logo-card img{
+
+    width:42px;
+
+}
+
+.sidebar.collapsed summary{
+
+    justify-content:center;
+
+}
+
+.sidebar.collapsed a{
+
+    justify-content:center;
+
+}
+
+
+/* =====================================================
+   Responsive
+===================================================== */
+
+@media (max-width:992px){
+
+    .sidebar{
+
+        position:fixed;
+
+        right:-280px;
+
+    }
+
+    .sidebar.show{
+
+        right:0;
+
+    }
+
+    .page-content{
+
+        padding:18px;
+
+    }
+
+    .topbar{
+
+        padding:0 16px;
+
+    }
+
+    .company-title{
+
+        display:none;
+
+    }
+
+}

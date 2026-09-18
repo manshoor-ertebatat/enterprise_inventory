@@ -1,0 +1,8 @@
+.git
+.gitignore
+*.md
+instance
+backups
+Start-ManshoorInventory.bat
+backup_inventory.sh
+restore_backup.sh
