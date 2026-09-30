@@ -23,14 +23,14 @@ if errorlevel 1 (
 echo Docker is ready.
 echo.
 
-docker image inspect manshoor-inventory:v1.0.2 >nul 2>&1
+docker image inspect manshoor-inventory:v1.0.5 >nul 2>&1
 
 if errorlevel 1 (
     echo Loading Manshoor Inventory image...
     echo This may take a few seconds.
     echo.
 
-    docker load -i "manshoor-inventory-v1.0.2.tar"
+    docker load -i "manshoor-inventory-v1.0.5.tar"
 
     if errorlevel 1 (
         echo.
@@ -67,7 +67,7 @@ set /a attempts=0
 :WAIT_LOOP
 set /a attempts+=1
 
-powershell -NoProfile -Command "try { $r=Invoke-WebRequest -UseBasicParsing -Uri 'http://localhost:5003' -TimeoutSec 2; if ($r.StatusCode -eq 200) { exit 0 } else { exit 1 } } catch { exit 1 }" >nul 2>&1
+powershell -NoProfile -Command "try { $r=Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:5003' -TimeoutSec 2; if ($r.StatusCode -eq 200) { exit 0 } else { exit 1 } } catch { exit 1 }" >nul 2>&1
 
 if not errorlevel 1 goto READY
 
@@ -85,7 +85,7 @@ echo.
 echo Opening browser...
 echo.
 
-start "" "http://localhost:5003"
+start "" "http://127.0.0.1:5003"
 
 exit /b 0
 

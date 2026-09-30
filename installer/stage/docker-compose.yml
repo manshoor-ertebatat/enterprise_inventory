@@ -2,12 +2,19 @@ name: manshoor-inventory
 
 services:
   inventory:
-    image: manshoor-inventory:v1.0.2
+    image: manshoor-inventory:v1.0.5
     container_name: enterprise_inventory_v2
     restart: unless-stopped
     ports:
       - "5003:5001"
+    environment:
+      - TZ=Asia/Tehran
+      - MANSHOOR_BACKUP_PATH=${MANSHOOR_BACKUP_PATH:-./backups}
     volumes:
-      - ./instance:/app/instance
-      - ./backups:/app/backups
+      - type: bind
+        source: ./instance
+        target: /app/instance
+      - type: bind
+        source: ${MANSHOOR_BACKUP_PATH:-./backups}
+        target: /app/backups
     working_dir: /app

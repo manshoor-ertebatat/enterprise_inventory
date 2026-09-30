@@ -21,6 +21,9 @@ from sqlalchemy import func
 import io
 import os
 import jdatetime
+import json
+import secrets
+import time
 from datetime import datetime
 
 def normalize_digits(value):
@@ -1096,6 +1099,70 @@ def export_report_excel():
         )
     )
 
+@bp.route("/backup/select-path")
+def backup_select_path():
+    if "user" not in session:
+        return redirect("/")
+
+    if session.get("role") != "admin":
+        return "Access Denied"
+
+    token = secrets.token_urlsafe(32)
+
+    token_data = {
+        "token": token,
+        "expires": int(time.time()) + 120,
+        "used": False
+    }
+
+    token_file = "/app/instance/backup_path_token.json"
+
+    with open(token_file, "w", encoding="utf-8") as f:
+        json.dump(token_data, f)
+
+    protocol_url = (
+        "manshoor-inventory://select-backup?token="
+        + token
+    )
+
+    return protocol_url
+
+
+@bp.route("/backup/authorize-path")
+def backup_authorize_path():
+    token = request.args.get("token", "")
+
+    if not token:
+        return jsonify({"authorized": False}), 403
+
+    token_file = "/app/instance/backup_path_token.json"
+
+    try:
+        with open(token_file, "r", encoding="utf-8") as f:
+            token_data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return jsonify({"authorized": False}), 403
+
+    if token_data.get("used"):
+        return jsonify({"authorized": False}), 403
+
+    if int(time.time()) > int(token_data.get("expires", 0)):
+        return jsonify({"authorized": False}), 403
+
+    if not secrets.compare_digest(
+        str(token_data.get("token", "")),
+        token
+    ):
+        return jsonify({"authorized": False}), 403
+
+    token_data["used"] = True
+
+    with open(token_file, "w", encoding="utf-8") as f:
+        json.dump(token_data, f)
+
+    return jsonify({"authorized": True})
+
+
 @bp.route("/backup")
 def backup_database():
 
@@ -1107,6 +1174,11 @@ def backup_database():
 
     backup_dir = "/app/backups"
     os.makedirs(backup_dir, exist_ok=True)
+
+    backup_host_path = os.environ.get(
+        "MANSHOOR_BACKUP_PATH",
+        r"C:\\ManshoorInventory\\backups"
+    )
 
     backups = []
 
@@ -1130,7 +1202,8 @@ def backup_database():
 
     return render_template(
         "backup.html",
-        backups=backups
+        backups=backups,
+        backup_host_path=backup_host_path
     )
 
 
@@ -2762,3 +2835,124 @@ def project_returns_submit():
     return redirect(
         f"/project-returns?project={movement.project_name}"
     )
+
+@bp.route("/backup/restore", methods=["POST"])
+def restore_backup():
+    if "user" not in session:
+        return redirect("/")
+
+    if session.get("role") != "admin":
+        return "Access Denied", 403
+
+    import sqlite3
+    import shutil
+    from werkzeug.utils import safe_join
+
+    filename = request.form.get("filename", "").strip()
+
+    if not filename or not filename.lower().endswith(".db"):
+        flash("فایل پشتیبان نامعتبر است.", "danger")
+        return redirect("/backup")
+
+    backup_dir = "/app/backups"
+    instance_dir = "/app/instance"
+    db_path = os.path.join(instance_dir, "data.db")
+
+    backup_path = safe_join(backup_dir, filename)
+
+    if not backup_path or not os.path.isfile(backup_path):
+        flash("فایل پشتیبان موردنظر پیدا نشد.", "danger")
+        return redirect("/backup")
+
+    if not os.path.isfile(db_path):
+        flash("دیتابیس فعلی پیدا نشد؛ عملیات بازیابی متوقف شد.", "danger")
+        return redirect("/backup")
+
+    # مرحله ۱: بررسی سلامت فایل پشتیبان
+    try:
+        uri = "file:" + backup_path + "?mode=ro"
+
+        with sqlite3.connect(uri, uri=True) as conn:
+            result = conn.execute("PRAGMA integrity_check").fetchone()
+
+        if not result or str(result[0]).lower() != "ok":
+            flash("فایل پشتیبان سالم نیست و قابل بازیابی نمی‌باشد.", "danger")
+            return redirect("/backup")
+
+    except sqlite3.DatabaseError:
+        flash("فایل پشتیبان یک دیتابیس معتبر SQLite نیست.", "danger")
+        return redirect("/backup")
+
+    emergency_path = None
+    temp_path = None
+
+    try:
+        # مرحله ۲: ایجاد نسخه اضطراری از دیتابیس فعلی
+        emergency_filename = (
+            "emergency_backup_"
+            + datetime.now().strftime("%Y-%m-%d_%H%M%S_%f")
+            + ".db"
+        )
+
+        emergency_path = os.path.join(
+            backup_dir,
+            emergency_filename
+        )
+
+        with sqlite3.connect(db_path) as source_conn, \
+             sqlite3.connect(emergency_path) as emergency_conn:
+            source_conn.backup(emergency_conn)
+
+        # مرحله ۳: ساخت دیتابیس موقت از فایل پشتیبان
+        temp_path = os.path.join(
+            instance_dir,
+            ".data.db.restore-" + secrets.token_hex(8)
+        )
+
+        with sqlite3.connect(backup_path) as source_conn, \
+             sqlite3.connect(temp_path) as temp_conn:
+            source_conn.backup(temp_conn)
+
+        # مرحله ۴: آزاد کردن Connectionهای SQLAlchemy
+        db.session.remove()
+        db.engine.dispose()
+
+        # مرحله ۵: جایگزینی محتوای دیتابیس
+        # data.db به‌صورت bind mount است؛ بنابراین به‌جای os.replace
+        # محتوای فایل را روی همان فایل موجود کپی می‌کنیم.
+        shutil.copy2(temp_path, db_path)
+        os.remove(temp_path)
+        temp_path = None
+
+        # مرحله ۶: ثبت رویداد بازیابی در دیتابیس جدید
+        try:
+            log_activity(
+                session.get("user", "admin"),
+                "RESTORE_DATABASE",
+                f"بازیابی دیتابیس از فایل {filename}"
+            )
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+        flash(
+            f"دیتابیس با موفقیت از فایل «{filename}» بازیابی شد. "
+            f"نسخه اضطراری نیز با نام «{emergency_filename}» ایجاد شد.",
+            "success"
+        )
+
+    except Exception as exc:
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.remove(temp_path)
+            except Exception:
+                pass
+
+        print(f"RESTORE ERROR: {exc}")
+
+        flash(
+            "بازیابی انجام نشد. دیتابیس فعلی حفظ شده است.",
+            "danger"
+        )
+
+    return redirect("/backup")

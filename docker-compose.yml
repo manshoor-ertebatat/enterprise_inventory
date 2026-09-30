@@ -1,12 +1,15 @@
 services:
   inventory:
     build: .
-    container_name: enterprise_inventory_v2
+    container_name: enterprise_inventory_v2_dev
 
     restart: unless-stopped
 
     ports:
-      - "5003:5001"
+      - "5005:5001"
+
+    environment:
+      - TZ=Asia/Tehran
 
     volumes:
       - .:/app

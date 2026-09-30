@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 setlocal EnableExtensions EnableDelayedExpansion
 
 title Manshoor Inventory - Restore
@@ -26,13 +26,13 @@ echo.
 
 echo Checking Manshoor Inventory image...
 
-docker image inspect manshoor-inventory:v1.0.2 >nul 2>&1
+docker image inspect manshoor-inventory:v1.0.3 >nul 2>&1
 
 if errorlevel 1 (
     echo Image not found. Loading embedded image...
     echo.
 
-    if not exist "manshoor-inventory-v1.0.2.tar" (
+    if not exist "manshoor-inventory-v1.0.3.tar" (
         echo.
         echo ERROR: Embedded Docker image was not found.
         echo.
@@ -40,7 +40,7 @@ if errorlevel 1 (
         exit /b 1
     )
 
-    docker load -i "manshoor-inventory-v1.0.2.tar"
+    docker load -i "manshoor-inventory-v1.0.3.tar"
 
     if errorlevel 1 (
         echo.
@@ -56,9 +56,19 @@ if errorlevel 1 (
 
 echo.
 
-if not exist "backups" (
+set "BACKUP_DIR=%cd%\backups"
+
+if exist "config\backup-path.txt" (
+    set /p "BACKUP_DIR="<"config\backup-path.txt"
+)
+
+if not defined BACKUP_DIR (
+    set "BACKUP_DIR=%cd%\backups"
+)
+
+if not exist "%BACKUP_DIR%" (
     echo ERROR: Backup folder not found:
-    echo %cd%\backups
+    echo %BACKUP_DIR%
     echo.
     pause
     exit /b 1
@@ -77,7 +87,7 @@ echo.
 
 set /a count=0
 
-for /f "delims=" %%F in ('dir /b /a-d /o-d "backups\*.db" 2^>nul') do (
+for /f "delims=" %%F in ('dir /b /a-d /o-d "%BACKUP_DIR%\*.db" 2^>nul') do (
     set /a count+=1
     set "backup_!count!=%%F"
     echo !count!^) %%F
@@ -114,7 +124,7 @@ if not defined selected (
 
 echo.
 echo Selected backup:
-echo %cd%\backups\%selected%
+echo %BACKUP_DIR%\%selected%
 echo.
 
 echo.
@@ -122,8 +132,8 @@ echo Checking backup integrity...
 echo.
 
 docker run --rm ^
-  -v "%cd%\backups:/backups" ^
-  manshoor-inventory:v1.0.2 ^
+  -v "%BACKUP_DIR%:/backups" ^
+  manshoor-inventory:v1.0.3 ^
   python -c "import sqlite3,sys; p='/backups/%selected%'; c=sqlite3.connect(p); r=c.execute('PRAGMA integrity_check;').fetchone()[0]; c.close(); print(r); sys.exit(0 if r=='ok' else 1)"
 
 if errorlevel 1 (
@@ -182,7 +192,7 @@ if not exist "instance\data.db" (
 
 for /f "delims=" %%T in ('powershell -NoProfile -Command "(Get-Date).ToString('yyyy-MM-dd_HH-mm-ss')"') do set "timestamp=%%T"
 
-set "emergency=backups\before_restore_%timestamp%.db"
+set "emergency=%BACKUP_DIR%\before_restore_%timestamp%.db"
 
 cmd.exe /c copy /Y "instance\data.db" "%emergency%" >nul
 
@@ -198,12 +208,12 @@ if errorlevel 1 (
 )
 
 echo Emergency backup created:
-echo %cd%\%emergency%
+echo %emergency%
 echo.
 
 echo Restoring database...
 
-cmd.exe /c copy /Y "backups\%selected%" "instance\data.db" >nul
+cmd.exe /c copy /Y "%BACKUP_DIR%\%selected%" "instance\data.db" >nul
 
 if errorlevel 1 (
     echo.
@@ -225,7 +235,7 @@ if errorlevel 1 (
     echo ERROR: Could not start Manshoor Inventory.
     echo.
     echo The emergency backup is available at:
-    echo %cd%\%emergency%
+    echo %emergency%
     echo.
     pause
     exit /b 1

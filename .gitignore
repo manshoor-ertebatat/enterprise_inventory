@@ -51,3 +51,4 @@ sidebar_old.html
 
 installer/stage/*.tar
 installer/output/
+restore_test/
