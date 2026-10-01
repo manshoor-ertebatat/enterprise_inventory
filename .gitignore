@@ -52,3 +52,6 @@ sidebar_old.html
 installer/stage/*.tar
 installer/output/
 restore_test/
+
+# Mobile/API test data
+mobile_test/

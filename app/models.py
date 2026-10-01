@@ -26,6 +26,11 @@ class User(db.Model):
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
+    barcode = db.Column(
+        db.String(100),
+        unique=True,
+        nullable=True
+    )
     qty = db.Column(db.Integer, default=0)
     has_serial = db.Column(db.Integer, default=0)
     is_active = db.Column(db.Integer, default=1)
