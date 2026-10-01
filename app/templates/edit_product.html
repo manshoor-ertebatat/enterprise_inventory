@@ -39,6 +39,19 @@ value="{{ product.name }}"
 
 <div class="mb-3">
 
+<label>بارکد کالا</label>
+
+<input
+class="form-control"
+type="text"
+name="barcode"
+value="{{ product.barcode or '' }}"
+placeholder="بارکد را وارد یا اسکن کنید">
+
+</div>
+
+<div class="mb-3">
+
 <label>موجودی</label>
 
 <input

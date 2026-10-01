@@ -18,6 +18,7 @@ from app.models import (
 from openpyxl import Workbook
 from flask import send_file, jsonify
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 import io
 import os
 import jdatetime
@@ -317,6 +318,8 @@ def add():
         return redirect("/products")
 
     name = request.form.get("name", "").strip()
+    barcode = request.form.get("barcode", "").strip() or None
+
     qty_text = normalize_digits(
         request.form.get("qty", "0").strip()
     )
@@ -369,6 +372,7 @@ def add():
 
     p = Product(
         name=name,
+        barcode=barcode,
         qty=qty,
         has_serial=has_serial,
         min_qty=min_qty,
@@ -378,7 +382,21 @@ def add():
     )
 
     db.session.add(p)
-    db.session.commit()
+
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+
+        if barcode:
+            flash(
+                f"بارکد «{barcode}» قبلاً برای یک کالای دیگر ثبت شده است.",
+                "warning"
+            )
+        else:
+            flash("ثبت کالا انجام نشد؛ خطای تکراری بودن اطلاعات رخ داد.", "danger")
+
+        return redirect("/products")
 
     log_activity(
         session["user"],
@@ -659,6 +677,7 @@ def edit_product(id):
     if request.method == "POST":
 
         new_name = request.form.get("name", "").strip()
+        new_barcode = request.form.get("barcode", "").strip() or None
         qty_text = request.form.get("qty", "").strip()
         min_qty_text = request.form.get("min_qty", "5").strip()
         new_unit = request.form.get("unit", "عدد").strip() or "عدد"
@@ -735,6 +754,7 @@ def edit_product(id):
         old_min_qty = product.min_qty
 
         product.name = new_name
+        product.barcode = new_barcode
         product.qty = new_qty
         product.min_qty = new_min_qty
         product.unit = new_unit
@@ -742,7 +762,20 @@ def edit_product(id):
         product.condition = new_condition
         product.has_serial = new_has_serial
 
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+
+            if new_barcode:
+                flash(
+                    f"بارکد «{new_barcode}» قبلاً برای یک کالای دیگر ثبت شده است.",
+                    "warning"
+                )
+            else:
+                flash("ویرایش کالا انجام نشد؛ خطای تکراری بودن اطلاعات رخ داد.", "danger")
+
+            return redirect(f"/edit/{product.id}")
 
         log_activity(
             session["user"],
