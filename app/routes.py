@@ -1,5 +1,6 @@
 
 from flask import Blueprint, render_template, request, redirect, session, flash
+from functools import wraps
 from app.models import (
     db,
     Product,
@@ -13,7 +14,8 @@ from app.models import (
     RequestNote,
     InventoryDocument,
     InventoryDocumentItem,
-    ProjectReturn
+    ProjectReturn,
+    ApiToken,
 )
 from openpyxl import Workbook
 from flask import send_file, jsonify
@@ -25,7 +27,8 @@ import jdatetime
 import json
 import secrets
 import time
-from datetime import datetime
+import hashlib
+from datetime import datetime, timedelta
 
 def normalize_digits(value):
 
@@ -83,6 +86,95 @@ bp.add_app_template_filter(
     shamsi_date,
     "shamsi"
 )
+
+def create_api_token(user_id, device_name=None, days=30):
+    raw_token = secrets.token_urlsafe(32)
+    token_hash = hashlib.sha256(raw_token.encode("utf-8")).hexdigest()
+
+    token = ApiToken(
+        user_id=user_id,
+        token_hash=token_hash,
+        device_name=device_name,
+        created_at=datetime.utcnow(),
+        expires_at=datetime.utcnow() + timedelta(days=days),
+        is_active=1,
+    )
+
+    db.session.add(token)
+    db.session.commit()
+
+    return raw_token
+
+
+def get_api_token(raw_token):
+    if not raw_token:
+        return None
+
+    token_hash = hashlib.sha256(raw_token.encode("utf-8")).hexdigest()
+
+    token = ApiToken.query.filter_by(
+        token_hash=token_hash,
+        is_active=1
+    ).first()
+
+    if not token:
+        return None
+
+    if token.expires_at and token.expires_at < datetime.utcnow():
+        token.is_active = 0
+        db.session.commit()
+        return None
+
+    token.last_used_at = datetime.utcnow()
+    db.session.commit()
+
+    return token
+
+
+def revoke_api_token(token):
+    token.is_active = 0
+    db.session.commit()
+
+
+def api_auth_required(view_func):
+    @wraps(view_func)
+    def wrapped(*args, **kwargs):
+        auth_header = request.headers.get("Authorization", "")
+
+        if not auth_header.startswith("Bearer "):
+            return jsonify({
+                "success": False,
+                "message": "توکن احراز هویت ارسال نشده است."
+            }), 401
+
+        raw_token = auth_header[7:].strip()
+
+        if not raw_token:
+            return jsonify({
+                "success": False,
+                "message": "توکن احراز هویت معتبر نیست."
+            }), 401
+
+        token = get_api_token(raw_token)
+
+        if not token:
+            return jsonify({
+                "success": False,
+                "message": "توکن نامعتبر یا منقضی شده است."
+            }), 401
+
+        user = User.query.get(token.user_id)
+
+        if not user:
+            return jsonify({
+                "success": False,
+                "message": "کاربر مربوط به این توکن پیدا نشد."
+            }), 401
+
+        return view_func(user, *args, **kwargs)
+
+    return wrapped
+
 
 @bp.route("/")
 def login():
@@ -2989,3 +3081,63 @@ def restore_backup():
         )
 
     return redirect("/backup")
+
+@bp.route("/api/v1/login", methods=["POST"])
+def api_login():
+    data = request.get_json(silent=True) or {}
+
+    username = data.get("username", "").strip()
+    password = data.get("password", "")
+    device_name = data.get("device_name", "").strip() or None
+
+    if not username or not password:
+        return jsonify({
+            "success": False,
+            "message": "نام کاربری و رمز عبور الزامی است."
+        }), 400
+
+    user = User.query.filter_by(
+        username=username,
+        password=password
+    ).first()
+
+    if not user:
+        return jsonify({
+            "success": False,
+            "message": "نام کاربری یا رمز عبور اشتباه است."
+        }), 401
+
+    raw_token = create_api_token(
+        user_id=user.id,
+        device_name=device_name
+    )
+
+    log_activity(
+        user.username,
+        "API_LOGIN",
+        f"ورود موبایل - {device_name or 'دستگاه نامشخص'}"
+    )
+
+    return jsonify({
+        "success": True,
+        "message": "ورود با موفقیت انجام شد.",
+        "token": raw_token,
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "role": user.role
+        }
+    })
+
+
+@bp.route("/api/v1/me", methods=["GET"])
+@api_auth_required
+def api_me(user):
+    return jsonify({
+        "success": True,
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "role": user.role
+        }
+    })

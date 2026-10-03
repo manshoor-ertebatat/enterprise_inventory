@@ -356,3 +356,46 @@ class ProjectReturn(db.Model):
         db.DateTime,
         default=datetime.utcnow
     )
+
+
+class ApiToken(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        nullable=False,
+        index=True
+    )
+
+    token_hash = db.Column(
+        db.String(64),
+        unique=True,
+        nullable=False,
+        index=True
+    )
+
+    device_name = db.Column(
+        db.String(100)
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+    last_used_at = db.Column(
+        db.DateTime
+    )
+
+    expires_at = db.Column(
+        db.DateTime
+    )
+
+    is_active = db.Column(
+        db.Integer,
+        default=1
+    )
