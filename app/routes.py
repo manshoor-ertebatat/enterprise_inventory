@@ -3418,3 +3418,155 @@ def api_mobile_stock_out(user):
             "success": False,
             "message": "ثبت خروج کالا انجام نشد."
         }), 500
+
+
+@bp.route("/api/v1/stock/in", methods=["POST"])
+@api_auth_required
+def api_mobile_stock_in(user):
+    data = request.get_json(silent=True) or {}
+
+    try:
+        product_id = int(data.get("product_id"))
+        qty = int(data.get("qty"))
+    except (TypeError, ValueError):
+        return jsonify({
+            "success": False,
+            "message": "شناسه کالا یا تعداد ورود معتبر نیست."
+        }), 400
+
+    if qty <= 0:
+        return jsonify({
+            "success": False,
+            "message": "تعداد ورود باید بیشتر از صفر باشد."
+        }), 400
+
+    supplier_name = str(
+        data.get("supplier_name", "") or ""
+    ).strip()
+
+    description = str(
+        data.get("description", "") or ""
+    ).strip()
+
+    product = Product.query.filter_by(
+        id=product_id,
+        is_active=True
+    ).first()
+
+    if not product:
+        return jsonify({
+            "success": False,
+            "message": "کالا پیدا نشد."
+        }), 404
+
+    serial_numbers = data.get("serial_numbers", [])
+
+    if product.has_serial:
+
+        if not isinstance(serial_numbers, list):
+            return jsonify({
+                "success": False,
+                "message": "لیست شماره سریال‌ها معتبر نیست."
+            }), 400
+
+        if len(serial_numbers) != qty:
+            return jsonify({
+                "success": False,
+                "message": f"باید دقیقاً {qty} شماره سریال ارسال شود.",
+                "requested_qty": qty,
+                "received_serials": len(serial_numbers)
+            }), 400
+
+        cleaned_serials = []
+
+        for serial_number in serial_numbers:
+            serial_number = str(serial_number or "").strip()
+
+            if not serial_number:
+                return jsonify({
+                    "success": False,
+                    "message": "شماره سریال نمی‌تواند خالی باشد."
+                }), 400
+
+            cleaned_serials.append(serial_number)
+
+        if len(set(cleaned_serials)) != len(cleaned_serials):
+            return jsonify({
+                "success": False,
+                "message": "شماره سریال تکراری ارسال شده است."
+            }), 400
+
+        existing_serial = ProductSerial.query.filter(
+            ProductSerial.serial_number.in_(cleaned_serials)
+        ).first()
+
+        if existing_serial:
+            return jsonify({
+                "success": False,
+                "message": f"شماره سریال «{existing_serial.serial_number}» قبلاً در سیستم ثبت شده است."
+            }), 400
+
+        serial_numbers = cleaned_serials
+
+    else:
+
+        if serial_numbers:
+            return jsonify({
+                "success": False,
+                "message": "این کالا سریال ندارد و نباید شماره سریال ارسال شود."
+            }), 400
+
+        serial_numbers = []
+
+    try:
+        # افزایش موجودی
+        product.qty += qty
+
+        # ثبت گردش کالا
+        movement = Movement(
+            product_id=product.id,
+            type="IN",
+            qty=qty,
+            receiver_name=supplier_name,
+            description=description,
+            created_by=user.username
+        )
+
+        db.session.add(movement)
+        db.session.flush()
+
+        # ثبت سریال‌های جدید
+        for serial_number in serial_numbers:
+            serial = ProductSerial(
+                product_id=product.id,
+                serial_number=serial_number,
+                status="IN_STOCK",
+                movement_id=movement.id,
+                created_by=user.username
+            )
+            db.session.add(serial)
+
+        db.session.commit()
+
+        log_activity(
+            user.username,
+            "STOCK_IN",
+            f"ورود {qty} عدد از کالا {product.name} از طریق موبایل"
+        )
+
+        return jsonify({
+            "success": True,
+            "message": "ورود کالا با موفقیت ثبت شد.",
+            "movement_id": movement.id,
+            "product_id": product.id,
+            "qty": qty,
+            "new_qty": product.qty
+        }), 201
+
+    except Exception:
+        db.session.rollback()
+
+        return jsonify({
+            "success": False,
+            "message": "ثبت ورود کالا انجام نشد."
+        }), 500
