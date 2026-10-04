@@ -3141,3 +3141,280 @@ def api_me(user):
             "role": user.role
         }
     })
+
+
+@bp.route("/api/v1/products", methods=["GET"])
+@api_auth_required
+def api_mobile_products(user):
+    q = request.args.get("q", "").strip()
+
+    query = Product.query.filter_by(is_active=True)
+
+    if q:
+        query = query.filter(
+            db.or_(
+                Product.name.ilike(f"%{q}%"),
+                Product.barcode.ilike(f"%{q}%")
+            )
+        )
+
+    products = query.order_by(Product.name.asc()).all()
+
+    return jsonify({
+        "success": True,
+        "count": len(products),
+        "products": [
+            {
+                "id": product.id,
+                "name": product.name,
+                "barcode": product.barcode,
+                "qty": product.qty,
+                "unit": product.unit,
+                "category": product.category,
+                "condition": product.condition,
+                "min_qty": product.min_qty,
+                "has_serial": bool(product.has_serial),
+            }
+            for product in products
+        ]
+    })
+
+
+@bp.route("/api/v1/products/<int:product_id>", methods=["GET"])
+@api_auth_required
+def api_mobile_product_detail(user, product_id):
+    product = Product.query.filter_by(
+        id=product_id,
+        is_active=True
+    ).first()
+
+    if not product:
+        return jsonify({
+            "success": False,
+            "message": "کالا پیدا نشد."
+        }), 404
+
+    return jsonify({
+        "success": True,
+        "product": {
+            "id": product.id,
+            "name": product.name,
+            "barcode": product.barcode,
+            "qty": product.qty,
+            "unit": product.unit,
+            "category": product.category,
+            "condition": product.condition,
+            "min_qty": product.min_qty,
+            "has_serial": bool(product.has_serial),
+        }
+    })
+
+
+@bp.route("/api/v1/products/<int:product_id>/serials", methods=["GET"])
+@api_auth_required
+def api_mobile_product_serials(user, product_id):
+    product = Product.query.filter_by(
+        id=product_id,
+        is_active=True
+    ).first()
+
+    if not product:
+        return jsonify({
+            "success": False,
+            "message": "کالا پیدا نشد."
+        }), 404
+
+    if not product.has_serial:
+        return jsonify({
+            "success": True,
+            "product_id": product.id,
+            "has_serial": False,
+            "count": 0,
+            "serials": []
+        })
+
+    serials = ProductSerial.query.filter_by(
+        product_id=product.id,
+        status="IN_STOCK"
+    ).order_by(ProductSerial.id.asc()).all()
+
+    return jsonify({
+        "success": True,
+        "product_id": product.id,
+        "has_serial": True,
+        "count": len(serials),
+        "serials": [
+            {
+                "id": serial.id,
+                "serial_number": serial.serial_number
+            }
+            for serial in serials
+        ]
+    })
+
+
+@bp.route("/api/v1/stock/out", methods=["POST"])
+@api_auth_required
+def api_mobile_stock_out(user):
+    data = request.get_json(silent=True) or {}
+
+    try:
+        product_id = int(data.get("product_id"))
+        qty = int(data.get("qty"))
+    except (TypeError, ValueError):
+        return jsonify({
+            "success": False,
+            "message": "شناسه کالا یا تعداد خروج معتبر نیست."
+        }), 400
+
+    if qty <= 0:
+        return jsonify({
+            "success": False,
+            "message": "تعداد خروج باید بیشتر از صفر باشد."
+        }), 400
+
+    receiver_name = str(data.get("receiver_name", "") or "").strip()
+    customer_name = str(data.get("customer_name", "") or "").strip()
+    project_name = str(data.get("project_name", "") or "").strip()
+    description = str(data.get("description", "") or "").strip()
+
+    product = Product.query.filter_by(
+        id=product_id,
+        is_active=True
+    ).first()
+
+    if not product:
+        return jsonify({
+            "success": False,
+            "message": "کالا پیدا نشد."
+        }), 404
+
+    # بررسی موجودی
+    if product.qty < qty:
+        return jsonify({
+            "success": False,
+            "message": "موجودی کالا برای این خروج کافی نیست.",
+            "available_qty": product.qty,
+            "requested_qty": qty
+        }), 400
+
+    # دریافت سریال‌ها
+    serial_ids = data.get("serial_ids", [])
+
+    if product.has_serial:
+
+        if not isinstance(serial_ids, list):
+            return jsonify({
+                "success": False,
+                "message": "لیست شماره سریال‌ها معتبر نیست."
+            }), 400
+
+        if len(serial_ids) != qty:
+            return jsonify({
+                "success": False,
+                "message": f"باید دقیقاً {qty} شماره سریال انتخاب شود.",
+                "requested_qty": qty,
+                "selected_serials": len(serial_ids)
+            }), 400
+
+        try:
+            serial_ids = [int(serial_id) for serial_id in serial_ids]
+        except (TypeError, ValueError):
+            return jsonify({
+                "success": False,
+                "message": "یکی از شناسه‌های سریال معتبر نیست."
+            }), 400
+
+        if len(set(serial_ids)) != len(serial_ids):
+            return jsonify({
+                "success": False,
+                "message": "شماره سریال تکراری انتخاب شده است."
+            }), 400
+
+        serials = ProductSerial.query.filter(
+            ProductSerial.id.in_(serial_ids)
+        ).all()
+
+        if len(serials) != len(serial_ids):
+            return jsonify({
+                "success": False,
+                "message": "یکی از شماره سریال‌های انتخاب شده پیدا نشد."
+            }), 400
+
+        serial_map = {serial.id: serial for serial in serials}
+
+        for serial_id in serial_ids:
+            serial = serial_map[serial_id]
+
+            if serial.product_id != product.id:
+                return jsonify({
+                    "success": False,
+                    "message": "یکی از شماره سریال‌ها متعلق به این کالا نیست."
+                }), 400
+
+            if serial.status != "IN_STOCK":
+                return jsonify({
+                    "success": False,
+                    "message": f"شماره سریال «{serial.serial_number}» دیگر در انبار موجود نیست."
+                }), 400
+
+    else:
+
+        if serial_ids:
+            return jsonify({
+                "success": False,
+                "message": "این کالا سریال ندارد و نباید شماره سریال ارسال شود."
+            }), 400
+
+        serials = []
+
+    try:
+        # کسر موجودی
+        product.qty -= qty
+
+        # ثبت گردش کالا
+        movement = Movement(
+            product_id=product.id,
+            type="OUT",
+            qty=qty,
+            receiver_name=receiver_name,
+            customer_name=customer_name,
+            project_name=project_name,
+            description=description,
+            created_by=user.username
+        )
+
+        db.session.add(movement)
+        db.session.flush()
+
+        # ثبت خروج سریال‌ها
+        for serial in serials:
+            serial.status = "OUT"
+            serial.movement_id = movement.id
+            serial.customer_name = customer_name or receiver_name
+            serial.created_by = user.username
+
+        db.session.commit()
+
+        log_activity(
+            user.username,
+            "STOCK_OUT",
+            f"خروج {qty} عدد از کالا {product.name} از طریق موبایل"
+        )
+
+        return jsonify({
+            "success": True,
+            "message": "خروج کالا با موفقیت ثبت شد.",
+            "movement_id": movement.id,
+            "product_id": product.id,
+            "qty": qty,
+            "remaining_qty": product.qty
+        }), 201
+
+    except Exception:
+        db.session.rollback()
+
+        return jsonify({
+            "success": False,
+            "message": "ثبت خروج کالا انجام نشد."
+        }), 500
