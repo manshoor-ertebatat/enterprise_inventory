@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <script src="{{ url_for("static", filename="js/html5-qrcode.min.js") }}" type="text/javascript"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>انبار موبایل | منشور ارتباطات</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f8;
+            color: #212529;
+            font-family: Tahoma, Arial, sans-serif;
+        }
+
+        .mobile-app {
+            width: 100%;
+            max-width: 600px;
+            min-height: 100vh;
+            margin: 0 auto;
+            background: #ffffff;
+        }
+
+        .mobile-header {
+            padding: 18px 16px;
+            background: #212529;
+            color: #fff;
+        }
+
+        .mobile-header h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .mobile-header p {
+            margin: 6px 0 0;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .mobile-content {
+            padding: 16px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .search-box input {
+            height: 54px;
+            padding-right: 48px;
+            border-radius: 14px;
+            font-size: 16px;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 16px;
+            top: 17px;
+            font-size: 20px;
+            color: #6c757d;
+        }
+
+        .scan-button {
+            width: 100%;
+            height: 54px;
+            border: 0;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .welcome-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            padding: 22px;
+            text-align: center;
+            background: #fff;
+        }
+
+        .welcome-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .welcome-card h2 {
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        .welcome-card p {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 0;
+        }
+
+        .mobile-footer {
+            padding: 18px 16px 24px;
+            text-align: center;
+            color: #adb5bd;
+            font-size: 12px;
+        }
+
+        @media (min-width: 601px) {
+            body {
+                padding: 20px 0;
+            }
+
+            .mobile-app {
+                min-height: calc(100vh - 40px);
+                border-radius: 20px;
+                overflow: hidden;
+                box-shadow: 0 8px 30px rgba(0,0,0,.08);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="mobile-app">
+
+    <header class="mobile-header">
+        <h1>
+            <i class="bi bi-box-seam"></i>
+            انبار منشور ارتباطات
+        </h1>
+        <p>پنل مدیریت انبار موبایل</p>
+    </header>
+
+    <main class="mobile-content">
+
+        <!-- Login -->
+        <section id="loginSection">
+
+            <div class="welcome-card">
+                <div class="welcome-icon">
+                    🔐
+                </div>
+
+                <h2>ورود به پنل موبایل</h2>
+
+                <p>
+                    برای استفاده از امکانات انبار، نام کاربری و رمز عبور خود را وارد کنید.
+                </p>
+
+                <div class="mt-4 text-end">
+
+                    <label class="form-label">نام کاربری</label>
+                    <input
+                        type="text"
+                        id="loginUsername"
+                        class="form-control form-control-lg mb-3"
+                        autocomplete="username"
+                    >
+
+                    <label class="form-label">رمز عبور</label>
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        class="form-control form-control-lg mb-3"
+                        autocomplete="current-password"
+                    >
+
+                    <div
+                        id="loginMessage"
+                        class="alert d-none"
+                        role="alert">
+                    </div>
+
+                    <button
+                        type="button"
+                        id="loginButton"
+                        class="btn btn-dark w-100"
+                        style="height:54px;border-radius:14px;font-size:16px;">
+                        <i class="bi bi-box-arrow-in-left"></i>
+                        ورود
+                    </button>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Mobile Inventory -->
+        <section id="inventorySection" class="d-none">
+
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input
+                type="text"
+                class="form-control"
+                placeholder="جستجوی کالا یا بارکد..."
+                autocomplete="off"
+            >
+        </div>
+
+        <button type="button" class="btn btn-dark scan-button" onclick="openBarcodeScanner()">
+            <i class="bi bi-upc-scan"></i>
+            اسکن بارکد
+        </button>
+
+        <div id="barcodeScanner" class="d-none mt-3">
+            <div id="barcodeReader" style="width:100%;"></div>
+
+            <div id="barcodeMessage"
+                 class="alert d-none mt-2"
+                 role="alert"></div>
+
+            <button
+                type="button"
+                class="btn btn-outline-danger w-100 mt-2"
+                onclick="closeBarcodeScanner()">
+                بستن دوربین
+            </button>
+        </div>
+
+        <div id="searchMessage" class="alert d-none" role="alert"></div>
+
+        <div id="productResults"></div>
+
+        <div id="productDetail" class="d-none"></div>
+
+        <div id="welcomeCard" class="welcome-card">
+
+            <div class="welcome-icon">
+                📦
+            </div>
+
+            <h2>به پنل موبایل انبار خوش آمدید</h2>
+
+            <p>
+                برای شروع، بارکد کالا را اسکن کنید
+                یا نام کالا را در قسمت جستجو وارد کنید.
+            </p>
+
+        </div>
+
+        </section>
+
+    </main>
+
+    <footer class="mobile-footer">
+        سیستم انبارداری منشور ارتباطات
+    </footer>
+
+</div>
+
+<script>
+const API_BASE = "";
+
+function showLoginMessage(message, type = "danger") {
+    const box = document.getElementById("loginMessage");
+
+    box.className = "alert alert-" + type;
+    box.textContent = message;
+}
+
+function showInventory() {
+    document.getElementById("loginSection").classList.add("d-none");
+    document.getElementById("inventorySection").classList.remove("d-none");
+}
+
+
+let searchTimer = null;
+
+function showSearchMessage(message, type = "danger") {
+    const box = document.getElementById("searchMessage");
+
+    box.className = "alert alert-" + type;
+    box.textContent = message;
+}
+
+function clearSearchMessage() {
+    const box = document.getElementById("searchMessage");
+    box.className = "alert d-none";
+    box.textContent = "";
+}
+
+function renderProducts(products) {
+
+    const container =
+        document.getElementById("productResults");
+
+    const welcome =
+        document.getElementById("welcomeCard");
+
+    container.innerHTML = "";
+
+    if (!products.length) {
+        welcome.classList.add("d-none");
+
+        container.innerHTML = `
+            <div class="welcome-card">
+                <div class="welcome-icon">🔍</div>
+                <h2>کالایی پیدا نشد</h2>
+                <p>نام کالا یا بارکد دیگری را جستجو کنید.</p>
+            </div>
+        `;
+
+        return;
+    }
+
+    welcome.classList.add("d-none");
+
+    products.forEach(product => {
+
+        const serialText =
+            product.has_serial ? "بله" : "خیر";
+
+        const barcodeText =
+            product.barcode || "—";
+
+        const card = document.createElement("div");
+
+        card.className = "welcome-card mb-3 text-end";
+
+        card.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h2 style="font-size:17px;margin:0;">
+                    <i class="bi bi-box-seam"></i>
+                    ${escapeHtml(product.name)}
+                </h2>
+
+                <span class="badge text-bg-secondary">
+                    ${escapeHtml(product.unit || "عدد")}
+                </span>
+            </div>
+
+            <div class="small text-secondary mb-2">
+                بارکد: ${escapeHtml(barcodeText)}
+            </div>
+
+            <div class="d-flex justify-content-between mb-2">
+                <span>موجودی</span>
+                <strong>${product.qty}</strong>
+            </div>
+
+            <div class="d-flex justify-content-between mb-3">
+                <span>سریال‌دار</span>
+                <strong>${serialText}</strong>
+            </div>
+
+            <button
+                type="button"
+                class="btn btn-dark w-100"
+                onclick="openProduct(${product.id})"
+                style="height:48px;border-radius:12px;">
+                مشاهده کالا
+            </button>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+async function searchProducts(query) {
+
+    const token =
+        localStorage.getItem("manshoor_mobile_token");
+
+    if (!token) {
+        return;
+    }
+
+    query = query.trim();
+
+    clearSearchMessage();
+
+    if (!query) {
+        document.getElementById("productResults").innerHTML = "";
+        document.getElementById("welcomeCard").classList.remove("d-none");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            API_BASE + "/api/v1/products?q=" +
+            encodeURIComponent(query),
+            {
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.status === 401) {
+            localStorage.removeItem("manshoor_mobile_token");
+            location.reload();
+            return;
+        }
+
+        if (!response.ok || !data.success) {
+            showSearchMessage(
+                data.message || "جستجو انجام نشد."
+            );
+            return;
+        }
+
+        renderProducts(data.products);
+
+    } catch (error) {
+
+        showSearchMessage(
+            "ارتباط با سرور برقرار نشد."
+        );
+    }
+}
+
+
+let barcodeScanner = null;
+
+
+async function openBarcodeScanner() {
+
+    const container =
+        document.getElementById("barcodeScanner");
+
+    const message =
+        document.getElementById("barcodeMessage");
+
+    if (!container) {
+        console.error("barcodeScanner container not found.");
+        return;
+    }
+
+    container.classList.remove("d-none");
+
+    if (message) {
+        message.className = "alert d-none";
+        message.textContent = "";
+    }
+
+    if (barcodeScanner) {
+        return;
+    }
+
+    if (typeof Html5Qrcode === "undefined") {
+
+        if (message) {
+            message.className = "alert alert-danger";
+            message.textContent =
+                "کتابخانه اسکن بارکد بارگذاری نشده است.";
+            message.classList.remove("d-none");
+        }
+
+        return;
+    }
+
+    barcodeScanner =
+        new Html5Qrcode("barcodeReader");
+
+    try {
+
+        await barcodeScanner.start(
+            {
+                facingMode: "environment"
+            },
+            {
+                fps: 10,
+                qrbox: {
+                    width: 280,
+                    height: 120
+                }
+            },
+
+            async (decodedText) => {
+
+                const barcode =
+                    decodedText.trim();
+
+                if (!barcode) {
+                    return;
+                }
+
+                await stopBarcodeScanner();
+
+                container.classList.add("d-none");
+
+                const input =
+                    document.querySelector(
+                        ".search-box input"
+                    );
+
+                if (input) {
+                    input.value = barcode;
+                }
+
+                searchProducts(barcode);
+            },
+
+            () => {
+                // خطاهای لحظه‌ای تشخیص بارکد نادیده گرفته می‌شوند.
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Barcode scanner error:",
+            error
+        );
+
+        barcodeScanner = null;
+
+        if (message) {
+            message.className =
+                "alert alert-danger";
+
+            message.textContent =
+                "دسترسی به دوربین امکان‌پذیر نیست.";
+
+            message.classList.remove("d-none");
+        }
+    }
+}
+
+
+async function stopBarcodeScanner() {
+
+    if (!barcodeScanner) {
+        return;
+    }
+
+    try {
+        await barcodeScanner.stop();
+    } catch (error) {
+        console.warn(
+            "Scanner stop warning:",
+            error
+        );
+    }
+
+    try {
+        barcodeScanner.clear();
+    } catch (error) {
+        console.warn(
+            "Scanner clear warning:",
+            error
+        );
+    }
+
+    barcodeScanner = null;
+}
+
+
+async function closeBarcodeScanner() {
+
+    await stopBarcodeScanner();
+
+    const container =
+        document.getElementById("barcodeScanner");
+
+    if (container) {
+        container.classList.add("d-none");
+    }
+}
+
+
+async function openProduct(productId) {
+
+    const token =
+        localStorage.getItem("manshoor_mobile_token");
+
+    if (!token) {
+        location.reload();
+        return;
+    }
+
+    const results =
+        document.getElementById("productResults");
+
+    const detail =
+        document.getElementById("productDetail");
+
+    const welcome =
+        document.getElementById("welcomeCard");
+
+    try {
+
+        const response = await fetch(
+            API_BASE + "/api/v1/products/" + productId,
+            {
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.status === 401) {
+            localStorage.removeItem("manshoor_mobile_token");
+            location.reload();
+            return;
+        }
+
+        if (!response.ok || !data.success) {
+            showSearchMessage(
+                data.message || "اطلاعات کالا دریافت نشد."
+            );
+            return;
+        }
+
+        const product = data.product;
+
+        window.currentProduct = product;
+        window.currentProductSerials = [];
+
+        let serialsHtml = "";
+
+        if (product.has_serial) {
+
+            try {
+
+                const serialResponse = await fetch(
+                    API_BASE + "/api/v1/products/" + productId + "/serials",
+                    {
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    }
+                );
+
+                const serialData = await serialResponse.json();
+
+                if (serialResponse.status === 401) {
+                    localStorage.removeItem("manshoor_mobile_token");
+                    location.reload();
+                    return;
+                }
+
+                if (serialResponse.ok && serialData.success) {
+
+                    const serials = serialData.serials || [];
+
+                    window.currentProductSerials = serials;
+
+                    if (serials.length > 0) {
+
+                        serialsHtml = `
+                            <div class="col-12">
+                                <div class="border rounded-3 p-3">
+
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+                                        <div class="small text-secondary">
+                                            سریال‌های موجود در انبار
+                                        </div>
+
+                                        <span class="badge text-bg-success">
+                                            ${serials.length} عدد
+                                        </span>
+
+                                    </div>
+
+                                    <div>
+                                        ${serials.map((serial, index) => `
+                                            <div
+                                                class="border rounded-3 p-2 mb-2 d-flex justify-content-between align-items-center"
+                                                style="background:#f8f9fa;">
+
+                                                <span class="small text-secondary">
+                                                    ${index + 1}
+                                                </span>
+
+                                                <strong style="direction:ltr;">
+                                                    ${escapeHtml(serial.serial_number)}
+                                                </strong>
+
+                                            </div>
+                                        `).join("")}
+                                    </div>
+
+                                </div>
+                            </div>
+                        `;
+
+                    } else {
+
+                        serialsHtml = `
+                            <div class="col-12">
+                                <div class="alert alert-warning mb-0">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    سریال موجودی برای این کالا ثبت نشده است.
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                }
+
+            } catch (serialError) {
+
+                serialsHtml = `
+                    <div class="col-12">
+                        <div class="alert alert-warning mb-0">
+                            دریافت لیست سریال‌ها انجام نشد.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        let movementsHtml = "";
+
+        try {
+
+            const movementResponse = await fetch(
+                API_BASE + "/api/v1/products/" + productId + "/movements",
+                {
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    }
+                }
+            );
+
+            const movementData = await movementResponse.json();
+
+            if (movementResponse.status === 401) {
+                localStorage.removeItem("manshoor_mobile_token");
+                location.reload();
+                return;
+            }
+
+            if (movementResponse.ok && movementData.success) {
+
+                const movements = movementData.movements || [];
+
+                if (movements.length > 0) {
+
+                    movementsHtml = `
+                        <div class="col-12">
+                            <div class="border rounded-3 p-3">
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="small text-secondary">
+                                        گردش کالا
+                                    </div>
+
+                                    <span class="badge text-bg-secondary">
+                                        ${movements.length} مورد
+                                    </span>
+                                </div>
+
+                                <div>
+                                    ${movements.map((movement) => `
+                                        <div class="border rounded-3 p-3 mb-2">
+
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+
+                                                <strong>
+                                                    ${movement.type === "IN"
+                                                        ? "ورود کالا"
+                                                        : "خروج کالا"}
+                                                </strong>
+
+                                                <span class="badge ${
+                                                    movement.type === "IN"
+                                                        ? "text-bg-success"
+                                                        : "text-bg-danger"
+                                                }">
+                                                    ${movement.qty} عدد
+                                                </span>
+
+                                            </div>
+
+                                            ${
+                                                movement.receiver_name
+                                                    ? `<div class="small mb-1">
+                                                        تحویل‌گیرنده: ${escapeHtml(movement.receiver_name)}
+                                                       </div>`
+                                                    : ""
+                                            }
+
+                                            ${
+                                                movement.customer_name
+                                                    ? `<div class="small mb-1">
+                                                        مشتری: ${escapeHtml(movement.customer_name)}
+                                                       </div>`
+                                                    : ""
+                                            }
+
+                                            ${
+                                                movement.project_name
+                                                    ? `<div class="small mb-1">
+                                                        پروژه: ${escapeHtml(movement.project_name)}
+                                                       </div>`
+                                                    : ""
+                                            }
+
+                                            ${
+                                                movement.description
+                                                    ? `<div class="small mb-1">
+                                                        توضیحات: ${escapeHtml(movement.description)}
+                                                       </div>`
+                                                    : ""
+                                            }
+
+                                            <div class="small text-secondary mt-2">
+                                                ثبت‌کننده: ${escapeHtml(movement.created_by || "—")}
+                                            </div>
+
+                                            <div class="small text-secondary">
+                                                تاریخ: ${escapeHtml(movement.timestamp || "—")}
+                                            </div>
+
+                                        </div>
+                                    `).join("")}
+                                </div>
+
+                            </div>
+                        </div>
+                    `;
+
+                } else {
+
+                    movementsHtml = `
+                        <div class="col-12">
+                            <div class="alert alert-light border mb-0">
+                                هنوز گردش کالایی برای این کالا ثبت نشده است.
+                            </div>
+                        </div>
+                    `;
+                }
+
+            } else {
+
+                movementsHtml = `
+                    <div class="col-12">
+                        <div class="alert alert-warning mb-0">
+                            دریافت تاریخچه گردش کالا انجام نشد.
+                        </div>
+                    </div>
+                `;
+            }
+
+        } catch (movementError) {
+
+            console.error("Product movements error:", movementError);
+
+            movementsHtml = `
+                <div class="col-12">
+                    <div class="alert alert-warning mb-0">
+                        دریافت تاریخچه گردش کالا انجام نشد.
+                    </div>
+                </div>
+            `;
+        }
+
+        results.innerHTML = "";
+        welcome.classList.add("d-none");
+        detail.classList.remove("d-none");
+
+        detail.innerHTML = `
+            <div class="welcome-card text-end">
+
+                <div class="d-flex justify-content-between align-items-start mb-3">
+
+                    <div>
+                        <div class="text-secondary small mb-1">
+                            کالا
+                        </div>
+
+                        <h2 style="font-size:20px;margin:0;">
+                            <i class="bi bi-box-seam"></i>
+                            ${escapeHtml(product.name)}
+                        </h2>
+                    </div>
+
+                    <span class="badge text-bg-dark">
+                        ${escapeHtml(product.unit || "عدد")}
+                    </span>
+
+                </div>
+
+                <hr>
+
+                <div class="row g-3">
+
+                    <div class="col-6">
+                        <div class="border rounded-3 p-3">
+                            <div class="small text-secondary">
+                                موجودی
+                            </div>
+                            <strong style="font-size:22px;">
+                                ${product.qty}
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="border rounded-3 p-3">
+                            <div class="small text-secondary">
+                                حداقل موجودی
+                            </div>
+                            <strong style="font-size:22px;">
+                                ${product.min_qty}
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="border rounded-3 p-3">
+                            <div class="small text-secondary">
+                                بارکد
+                            </div>
+                            <strong>
+                                ${escapeHtml(product.barcode || "—")}
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="border rounded-3 p-3">
+                            <div class="small text-secondary">
+                                دسته‌بندی
+                            </div>
+                            <strong>
+                                ${escapeHtml(product.category || "—")}
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="border rounded-3 p-3">
+                            <div class="small text-secondary">
+                                وضعیت
+                            </div>
+                            <strong>
+                                ${escapeHtml(product.condition || "—")}
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="border rounded-3 p-3">
+                            <div class="small text-secondary">
+                                سریال‌دار
+                            </div>
+                            <strong>
+                                ${product.has_serial ? "بله" : "خیر"}
+                            </strong>
+                        </div>
+                    </div>
+
+                    ${serialsHtml}
+
+                    ${movementsHtml}
+
+                </div>
+
+                <div class="row g-2 mt-3">
+
+                    <div class="col-6">
+                        <button
+                            type="button"
+                            class="btn btn-success w-100"
+                            onclick="openStockInForm()"
+                            style="height:50px;border-radius:12px;">
+                            <i class="bi bi-box-arrow-in-left"></i>
+                            ورود کالا
+                        </button>
+                    </div>
+
+                    <div class="col-6">
+                        <button
+                            type="button"
+                            class="btn btn-danger w-100"
+                            onclick="openStockOutForm()"
+                            style="height:50px;border-radius:12px;">
+                            <i class="bi bi-box-arrow-right"></i>
+                            خروج کالا
+                        </button>
+                    </div>
+
+                    <div class="col-6">
+                        <button
+                            type="button"
+                            class="btn btn-outline-dark w-100"
+                            onclick="closeProductDetail()"
+                            style="height:50px;border-radius:12px;">
+                            <i class="bi bi-arrow-right"></i>
+                            بازگشت
+                        </button>
+                    </div>
+
+                </div>
+
+                <div id="stockInForm" class="d-none mt-3">
+
+                    <div class="border rounded-3 p-3 text-end">
+
+                        <h5 class="mb-3">
+                            <i class="bi bi-box-arrow-in-left"></i>
+                            ورود کالا
+                        </h5>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                تعداد
+                            </label>
+
+                            <input
+                                type="number"
+                                id="stockInQty"
+                                class="form-control"
+                                min="1"
+                                value="1"
+                                style="height:48px;"
+                                onchange="updateStockInSerials()"
+                                oninput="updateStockInSerials()">
+                        </div>
+
+                        <div id="stockInSerials"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                تأمین‌کننده
+                            </label>
+
+                            <input
+                                type="text"
+                                id="stockInSupplier"
+                                class="form-control"
+                                placeholder="نام تأمین‌کننده"
+                                style="height:48px;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                توضیحات
+                            </label>
+
+                            <textarea
+                                id="stockInDescription"
+                                class="form-control"
+                                rows="3"
+                                placeholder="توضیحات ورود کالا"></textarea>
+                        </div>
+
+                        <div id="stockInMessage"
+                             class="alert d-none"></div>
+
+                        <button
+                            type="button"
+                            class="btn btn-success w-100"
+                            onclick="submitStockIn()"
+                            style="height:50px;border-radius:12px;">
+                            <i class="bi bi-check-lg"></i>
+                            ثبت ورود کالا
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div id="stockOutForm" class="d-none mt-3">
+
+                    <div class="border rounded-3 p-3 text-end">
+
+                        <h5 class="mb-3">
+                            <i class="bi bi-box-arrow-right"></i>
+                            خروج کالا
+                        </h5>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                تعداد
+                            </label>
+
+                            <input
+                                type="number"
+                                id="stockOutQty"
+                                class="form-control"
+                                min="1"
+                                value="1"
+                                style="height:48px;"
+                                onchange="updateStockOutSerials()"
+                                oninput="updateStockOutSerials()">
+                        </div>
+
+                        <div id="stockOutSerials"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                تحویل گیرنده
+                            </label>
+
+                            <input
+                                type="text"
+                                id="stockOutReceiver"
+                                class="form-control"
+                                placeholder="نام تحویل گیرنده"
+                                style="height:48px;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                مشتری
+                            </label>
+
+                            <input
+                                type="text"
+                                id="stockOutCustomer"
+                                class="form-control"
+                                placeholder="نام مشتری"
+                                style="height:48px;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                پروژه
+                            </label>
+
+                            <input
+                                type="text"
+                                id="stockOutProject"
+                                class="form-control"
+                                placeholder="نام پروژه"
+                                style="height:48px;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                توضیحات
+                            </label>
+
+                            <textarea
+                                id="stockOutDescription"
+                                class="form-control"
+                                rows="3"
+                                placeholder="توضیحات خروج کالا"></textarea>
+                        </div>
+
+                        <div id="stockOutMessage"
+                             class="alert d-none"></div>
+
+                        <button
+                            type="button"
+                            class="btn btn-danger w-100"
+                            onclick="submitStockOut()"
+                            style="height:50px;border-radius:12px;">
+                            <i class="bi bi-check-lg"></i>
+                            ثبت خروج کالا
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+
+    } catch (error) {
+
+        showSearchMessage(
+            "دریافت اطلاعات کالا انجام نشد."
+        );
+    }
+}
+
+function openStockInForm() {
+
+    const form =
+        document.getElementById("stockInForm");
+
+    form.classList.remove("d-none");
+
+    updateStockInSerials();
+
+    form.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+
+function updateStockInSerials() {
+
+    const qty =
+        parseInt(
+            document.getElementById("stockInQty").value || "0"
+        );
+
+    const container =
+        document.getElementById("stockInSerials");
+
+    if (!window.currentProduct ||
+        !window.currentProduct.has_serial) {
+
+        container.innerHTML = "";
+        return;
+    }
+
+    if (qty < 1) {
+        container.innerHTML = "";
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="mb-3">
+
+            <label class="form-label">
+                شماره سریال‌ها
+            </label>
+
+            <div class="small text-secondary mb-2">
+                برای هر کالا یک شماره سریال وارد کنید.
+            </div>
+
+            <div id="stockInSerialList"></div>
+
+        </div>
+    `;
+
+    const list =
+        document.getElementById("stockInSerialList");
+
+    for (let i = 1; i <= qty; i++) {
+
+        list.innerHTML += `
+            <div class="mb-2">
+                <input
+                    type="text"
+                    class="form-control stock-in-serial"
+                    placeholder="سریال ${i}"
+                    style="height:48px;direction:ltr;text-align:left;">
+            </div>
+        `;
+    }
+}
+
+
+function showStockInMessage(message, type = "info") {
+
+    const element =
+        document.getElementById("stockInMessage");
+
+    element.className =
+        "alert alert-" + type;
+
+    element.textContent = message;
+
+    element.classList.remove("d-none");
+}
+
+
+async function submitStockIn() {
+
+    const token =
+        localStorage.getItem("manshoor_mobile_token");
+
+    if (!token) {
+        location.reload();
+        return;
+    }
+
+    if (!window.currentProduct) {
+        showStockInMessage(
+            "کالا مشخص نیست.",
+            "danger"
+        );
+        return;
+    }
+
+    const qty =
+        parseInt(
+            document.getElementById("stockInQty").value || "0"
+        );
+
+    if (!qty || qty < 1) {
+        showStockInMessage(
+            "تعداد ورود باید حداقل 1 باشد.",
+            "warning"
+        );
+        return;
+    }
+
+    let serialNumbers = [];
+
+    if (window.currentProduct.has_serial) {
+
+        const inputs =
+            document.querySelectorAll(
+                ".stock-in-serial"
+            );
+
+        serialNumbers =
+            Array.from(inputs).map(
+                input => input.value.trim()
+            );
+
+        if (serialNumbers.length !== qty) {
+            showStockInMessage(
+                "تعداد شماره سریال‌ها با تعداد کالا برابر نیست.",
+                "warning"
+            );
+            return;
+        }
+
+        if (serialNumbers.some(serial => !serial)) {
+            showStockInMessage(
+                "لطفاً تمام شماره سریال‌ها را وارد کنید.",
+                "warning"
+            );
+            return;
+        }
+
+        const normalized =
+            serialNumbers.map(
+                serial => serial.toLowerCase()
+            );
+
+        if (new Set(normalized).size !== normalized.length) {
+            showStockInMessage(
+                "شماره سریال‌ها نباید تکراری باشند.",
+                "warning"
+            );
+            return;
+        }
+    }
+
+    const supplierName =
+        document
+            .getElementById("stockInSupplier")
+            .value.trim();
+
+    const description =
+        document
+            .getElementById("stockInDescription")
+            .value.trim();
+
+    const button =
+        document.querySelector(
+            '#stockInForm button[onclick="submitStockIn()"]'
+        );
+
+    button.disabled = true;
+
+    button.innerHTML =
+        '<span class="spinner-border spinner-border-sm"></span> در حال ثبت...';
+
+    try {
+
+        const response = await fetch(
+            API_BASE + "/api/v1/stock/in",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+
+                body: JSON.stringify({
+                    product_id: window.currentProduct.id,
+                    qty: qty,
+                    serial_numbers: serialNumbers,
+                    supplier_name: supplierName,
+                    description: description
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.status === 401) {
+            localStorage.removeItem("manshoor_mobile_token");
+            location.reload();
+            return;
+        }
+
+        if (!response.ok || !data.success) {
+
+            showStockInMessage(
+                data.message || "ثبت ورود کالا انجام نشد.",
+                "danger"
+            );
+
+            return;
+        }
+
+        showStockInMessage(
+            "ورود کالا با موفقیت ثبت شد.",
+            "success"
+        );
+
+        /*
+         * دریافت دوباره اطلاعات کالا برای نمایش
+         * موجودی و سریال‌های جدید.
+         */
+        await openProduct(window.currentProduct.id);
+
+        /*
+         * فرم ورود را دوباره باز نگه می‌داریم
+         * تا نتیجه ثبت برای کاربر مشخص باشد.
+         */
+        document
+            .getElementById("stockInForm")
+            .classList.remove("d-none");
+
+        document
+            .getElementById("stockInForm")
+            .scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+    } catch (error) {
+
+        showStockInMessage(
+            "خطا در ارتباط با سرور.",
+            "danger"
+        );
+
+    } finally {
+
+        button.disabled = false;
+
+        button.innerHTML =
+            '<i class="bi bi-check-lg"></i> ثبت ورود کالا';
+    }
+}
+
+
+function openStockOutForm() {
+
+    const form =
+        document.getElementById("stockOutForm");
+
+    form.classList.remove("d-none");
+
+    updateStockOutSerials();
+
+    form.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+
+function updateStockOutSerials() {
+
+    const qtyInput =
+        document.getElementById("stockOutQty");
+
+    const container =
+        document.getElementById("stockOutSerials");
+
+    const qty = parseInt(qtyInput.value || "0");
+
+    if (!window.currentProduct ||
+        !window.currentProduct.has_serial) {
+
+        container.innerHTML = "";
+        return;
+    }
+
+    const serials =
+        window.currentProductSerials || [];
+
+    if (qty < 1) {
+        container.innerHTML = "";
+        return;
+    }
+
+    if (qty > serials.length) {
+
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                تعداد انتخاب‌شده بیشتر از سریال‌های موجود است.
+                <br>
+                حداکثر قابل انتخاب:
+                <strong>${serials.length}</strong>
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="mb-3">
+
+            <label class="form-label">
+                انتخاب سریال
+            </label>
+
+            <div class="small text-secondary mb-2">
+                ${qty} سریال انتخاب کنید.
+            </div>
+
+            <div id="stockOutSerialList">
+                ${serials.map((serial, index) => `
+                    <label
+                        class="border rounded-3 p-3 mb-2 d-flex align-items-center"
+                        style="cursor:pointer;background:#f8f9fa;">
+
+                        <input
+                            type="checkbox"
+                            class="form-check-input ms-2 stock-out-serial"
+                            value="${serial.id}"
+                            onchange="checkStockOutSerialLimit()">
+
+                        <span class="flex-grow-1" style="direction:ltr;text-align:right;">
+                            ${escapeHtml(serial.serial_number)}
+                        </span>
+
+                    </label>
+                `).join("")}
+            </div>
+
+            <div
+                id="stockOutSelectedCount"
+                class="small text-secondary mt-2">
+                انتخاب شده: 0 از ${qty}
+            </div>
+
+        </div>
+    `;
+}
+
+
+function checkStockOutSerialLimit() {
+
+    const qty =
+        parseInt(
+            document.getElementById("stockOutQty").value || "0"
+        );
+
+    const checkboxes =
+        document.querySelectorAll(".stock-out-serial");
+
+    const selected =
+        Array.from(checkboxes).filter(
+            checkbox => checkbox.checked
+        );
+
+    if (selected.length > qty) {
+
+        selected[selected.length - 1].checked = false;
+
+        showStockOutMessage(
+            "بیشتر از تعداد تعیین‌شده نمی‌توانید سریال انتخاب کنید.",
+            "warning"
+        );
+    }
+
+    const count =
+        Array.from(
+            document.querySelectorAll(".stock-out-serial")
+        ).filter(
+            checkbox => checkbox.checked
+        ).length;
+
+    const counter =
+        document.getElementById("stockOutSelectedCount");
+
+    if (counter) {
+        counter.textContent =
+            "انتخاب شده: " + count + " از " + qty;
+    }
+}
+
+
+function showStockOutMessage(message, type = "info") {
+
+    const element =
+        document.getElementById("stockOutMessage");
+
+    element.className =
+        "alert alert-" + type;
+
+    element.textContent = message;
+
+    element.classList.remove("d-none");
+}
+
+
+async function submitStockOut() {
+
+    const token =
+        localStorage.getItem("manshoor_mobile_token");
+
+    if (!token) {
+        location.reload();
+        return;
+    }
+
+    if (!window.currentProduct) {
+        showStockOutMessage(
+            "کالا مشخص نیست.",
+            "danger"
+        );
+        return;
+    }
+
+    const qty =
+        parseInt(
+            document.getElementById("stockOutQty").value || "0"
+        );
+
+    if (!qty || qty < 1) {
+        showStockOutMessage(
+            "تعداد خروج باید حداقل 1 باشد.",
+            "warning"
+        );
+        return;
+    }
+
+    if (qty > window.currentProduct.qty) {
+        showStockOutMessage(
+            "موجودی کافی نیست. موجودی فعلی: " +
+            window.currentProduct.qty,
+            "warning"
+        );
+        return;
+    }
+
+    let serialIds = [];
+
+    if (window.currentProduct.has_serial) {
+
+        serialIds =
+            Array.from(
+                document.querySelectorAll(
+                    ".stock-out-serial:checked"
+                )
+            ).map(
+                checkbox => parseInt(checkbox.value)
+            );
+
+        if (serialIds.length !== qty) {
+            showStockOutMessage(
+                "لطفاً دقیقاً " + qty +
+                " سریال انتخاب کنید.",
+                "warning"
+            );
+            return;
+        }
+    }
+
+    const receiverName =
+        document
+            .getElementById("stockOutReceiver")
+            .value.trim();
+
+    const customerName =
+        document
+            .getElementById("stockOutCustomer")
+            .value.trim();
+
+    const projectName =
+        document
+            .getElementById("stockOutProject")
+            .value.trim();
+
+    const description =
+        document
+            .getElementById("stockOutDescription")
+            .value.trim();
+
+    const button =
+        document.querySelector(
+            '#stockOutForm button[onclick="submitStockOut()"]'
+        );
+
+    button.disabled = true;
+    button.innerHTML =
+        '<span class="spinner-border spinner-border-sm"></span> در حال ثبت...';
+
+    try {
+
+        const response = await fetch(
+            API_BASE + "/api/v1/stock/out",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+
+                body: JSON.stringify({
+                    product_id: window.currentProduct.id,
+                    qty: qty,
+                    serial_ids: serialIds,
+                    receiver_name: receiverName,
+                    customer_name: customerName,
+                    project_name: projectName,
+                    description: description
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.status === 401) {
+            localStorage.removeItem("manshoor_mobile_token");
+            location.reload();
+            return;
+        }
+
+        if (!response.ok || !data.success) {
+
+            showStockOutMessage(
+                data.message || "ثبت خروج کالا انجام نشد.",
+                "danger"
+            );
+
+            return;
+        }
+
+        showStockOutMessage(
+            "خروج کالا با موفقیت ثبت شد.",
+            "success"
+        );
+
+        /*
+         * بعد از ثبت موفق، جزئیات کالا را دوباره
+         * از سرور دریافت می‌کنیم تا موجودی و سریال‌ها
+         * به‌روز شوند.
+         */
+        await openProduct(window.currentProduct.id);
+
+        /*
+         * فرم دوباره باز می‌شود تا نتیجه ثبت
+         * برای کاربر قابل مشاهده باشد.
+         */
+        document
+            .getElementById("stockOutForm")
+            .classList.remove("d-none");
+
+        document
+            .getElementById("stockOutForm")
+            .scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+    } catch (error) {
+
+        showStockOutMessage(
+            "خطا در ارتباط با سرور.",
+            "danger"
+        );
+
+    } finally {
+
+        button.disabled = false;
+
+        button.innerHTML =
+            '<i class="bi bi-check-lg"></i> ثبت خروج کالا';
+    }
+}
+
+
+function closeProductDetail() {
+
+    document
+        .getElementById("productDetail")
+        .classList.add("d-none");
+
+    document
+        .getElementById("productDetail")
+        .innerHTML = "";
+
+    document
+        .getElementById("welcomeCard")
+        .classList.remove("d-none");
+
+    const input =
+        document.querySelector(".search-box input");
+
+    if (input.value.trim()) {
+        searchProducts(input.value);
+    }
+}
+
+async function checkExistingToken() {
+
+    const token = localStorage.getItem("manshoor_mobile_token");
+
+    if (!token) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            API_BASE + "/api/v1/me",
+            {
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            }
+        );
+
+        if (response.ok) {
+            showInventory();
+        } else {
+            localStorage.removeItem("manshoor_mobile_token");
+        }
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function login() {
+
+    const username =
+        document.getElementById("loginUsername").value.trim();
+
+    const password =
+        document.getElementById("loginPassword").value;
+
+    const button =
+        document.getElementById("loginButton");
+
+    if (!username || !password) {
+        showLoginMessage(
+            "نام کاربری و رمز عبور را وارد کنید."
+        );
+        return;
+    }
+
+    button.disabled = true;
+    button.innerHTML =
+        '<span class="spinner-border spinner-border-sm"></span> در حال ورود...';
+
+    try {
+
+        const response = await fetch(
+            API_BASE + "/api/v1/login",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    device_name: "Mobile Web"
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            showLoginMessage(
+                data.message || "ورود انجام نشد."
+            );
+            return;
+        }
+
+        localStorage.setItem(
+            "manshoor_mobile_token",
+            data.token
+        );
+
+        showInventory();
+
+    } catch (error) {
+
+        showLoginMessage(
+            "ارتباط با سرور برقرار نشد."
+        );
+
+    } finally {
+
+        button.disabled = false;
+        button.innerHTML =
+            '<i class="bi bi-box-arrow-in-left"></i> ورود';
+    }
+}
+
+document
+    .getElementById("loginButton")
+    .addEventListener("click", login);
+
+document
+    .getElementById("loginPassword")
+    .addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            login();
+        }
+    });
+
+const searchInput =
+    document.querySelector(".search-box input");
+
+searchInput.addEventListener("input", function() {
+
+    clearTimeout(searchTimer);
+
+    const query = this.value;
+
+    searchTimer = setTimeout(
+        () => searchProducts(query),
+        350
+    );
+});
+
+checkExistingToken();
+</script>
+
+</body>
+</html>

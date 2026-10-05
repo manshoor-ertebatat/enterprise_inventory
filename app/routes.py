@@ -3253,6 +3253,52 @@ def api_mobile_product_serials(user, product_id):
     })
 
 
+@bp.route("/api/v1/products/<int:product_id>/movements", methods=["GET"])
+@api_auth_required
+def api_mobile_product_movements(user, product_id):
+    product = Product.query.filter_by(
+        id=product_id,
+        is_active=True
+    ).first()
+
+    if not product:
+        return jsonify({
+            "success": False,
+            "message": "کالا پیدا نشد."
+        }), 404
+
+    movements = Movement.query.filter_by(
+        product_id=product.id
+    ).order_by(
+        Movement.timestamp.desc(),
+        Movement.id.desc()
+    ).limit(50).all()
+
+    return jsonify({
+        "success": True,
+        "product_id": product.id,
+        "count": len(movements),
+        "movements": [
+            {
+                "id": movement.id,
+                "type": movement.type,
+                "qty": movement.qty,
+                "receiver_name": movement.receiver_name or "",
+                "customer_name": movement.customer_name or "",
+                "project_name": movement.project_name or "",
+                "description": movement.description or "",
+                "created_by": movement.created_by or "",
+                "timestamp": (
+                    movement.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+                    if movement.timestamp
+                    else None
+                )
+            }
+            for movement in movements
+        ]
+    })
+
+
 @bp.route("/api/v1/stock/out", methods=["POST"])
 @api_auth_required
 def api_mobile_stock_out(user):
@@ -3570,3 +3616,8 @@ def api_mobile_stock_in(user):
             "success": False,
             "message": "ثبت ورود کالا انجام نشد."
         }), 500
+
+
+@bp.route("/mobile", methods=["GET"])
+def mobile():
+    return render_template("mobile.html")
