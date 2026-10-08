@@ -135,6 +135,159 @@
             }
         }
     </style>
+
+<style>
+/* ===== Dashboard Professional Style ===== */
+
+#dashboardSection {
+    padding-bottom: 10px;
+}
+
+.dashboard-header {
+    margin-bottom: 18px;
+}
+
+.dashboard-header h2 {
+    font-size: 21px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.dashboard-header p {
+    font-size: 13px;
+    color: #6c757d;
+    margin: 0;
+}
+
+/* Statistics cards */
+.dashboard-stat {
+    border: 0;
+    border-radius: 16px;
+    padding: 16px 14px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(0,0,0,.06);
+    height: 100%;
+    text-align: center;
+}
+
+.dashboard-stat .stat-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 9px;
+    background: #f1f3f5;
+}
+
+.dashboard-stat .stat-value {
+    display: block;
+    font-size: 25px;
+    line-height: 1.2;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.dashboard-stat .stat-title {
+    display: block;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* Recent movement statistics */
+.dashboard-period-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 14px 16px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.05);
+}
+
+.dashboard-period-card .period-title {
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.dashboard-period-card .period-value {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+/* Low stock */
+.dashboard-low-stock {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.06);
+}
+
+.dashboard-section-title {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.dashboard-low-item {
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 11px 12px;
+    margin-bottom: 8px;
+    background: #fafafa;
+}
+
+.dashboard-low-item:last-child {
+    margin-bottom: 0;
+}
+
+.dashboard-low-item .product-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.dashboard-low-item .product-stock {
+    font-size: 12px;
+    color: #dc3545;
+    margin-top: 3px;
+}
+
+/* Quick access */
+.dashboard-quick {
+    margin-top: 14px;
+}
+
+.dashboard-quick .btn {
+    min-height: 48px;
+    border-radius: 13px;
+    font-weight: 600;
+}
+
+/* Mobile spacing */
+@media (max-width: 575.98px) {
+    .dashboard-stat {
+        padding: 13px 10px;
+    }
+
+    .dashboard-stat .stat-value {
+        font-size: 22px;
+    }
+
+    .dashboard-stat .stat-title {
+        font-size: 11px;
+    }
+
+    .dashboard-stat .stat-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+    }
+
+    .dashboard-header h2 {
+        font-size: 19px;
+    }
+}
+</style>
+
 </head>
 
 <body>
@@ -204,7 +357,160 @@
         </section>
 
         <!-- Mobile Inventory -->
-        <section id="inventorySection" class="d-none">
+<!-- Mobile Dashboard -->
+<section id="dashboardSection" class="d-none">
+
+    <div class="dashboard-header d-flex justify-content-between align-items-center">
+        <div>
+            <h2>
+                <i class="bi bi-speedometer2"></i>
+                داشبورد انبار
+            </h2>
+            <p>نمای کلی وضعیت موجودی انبار</p>
+        </div>
+
+        <button
+            type="button"
+            class="btn btn-light border"
+            onclick="loadDashboard()"
+            style="width:44px;height:44px;border-radius:12px;">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
+    </div>
+
+    <div class="row g-2 mb-3">
+
+        <div class="col-6">
+            <div class="dashboard-stat">
+                <div class="stat-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <span id="dashboardTotalProducts" class="stat-value">—</span>
+                <span class="stat-title">تعداد کالا</span>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="dashboard-stat">
+                <div class="stat-icon">
+                    <i class="bi bi-stack"></i>
+                </div>
+                <span id="dashboardTotalQuantity" class="stat-value">—</span>
+                <span class="stat-title">موجودی کل</span>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="dashboard-stat">
+                <div class="stat-icon">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <span id="dashboardLowStock" class="stat-value">—</span>
+                <span class="stat-title">کم‌موجودی</span>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="dashboard-stat">
+                <div class="stat-icon">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+                <span id="dashboardOutOfStock" class="stat-value">—</span>
+                <span class="stat-title">ناموجود</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-2 mb-3">
+
+        <div class="col-6">
+            <div class="dashboard-period-card">
+                <div class="period-title">
+                    <i class="bi bi-arrow-down-circle"></i>
+                    ورود در ۳۰ روز اخیر
+                </div>
+                <div id="dashboardStockIn" class="period-value text-success">—</div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="dashboard-period-card">
+                <div class="period-title">
+                    <i class="bi bi-arrow-up-circle"></i>
+                    خروج در ۳۰ روز اخیر
+                </div>
+                <div id="dashboardStockOut" class="period-value text-danger">—</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="dashboard-low-stock mb-3">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <div class="dashboard-section-title">
+                <i class="bi bi-exclamation-triangle"></i>
+                کالاهای نیازمند تأمین
+            </div>
+
+            <span
+                id="dashboardLowStockBadge"
+                class="badge text-bg-warning">
+                ۰
+            </span>
+
+        </div>
+
+        <div id="dashboardLowStockList">
+            <div class="text-secondary small">
+                در حال دریافت اطلاعات...
+            </div>
+        </div>
+
+    </div>
+
+    <div class="dashboard-quick">
+
+        <div class="row g-2">
+
+            <div class="col-6">
+                <button
+                    type="button"
+                    class="btn btn-dark w-100"
+                    onclick="showInventorySearch()">
+                    <i class="bi bi-search"></i>
+                    جستجوی کالا
+                </button>
+            </div>
+
+            <div class="col-6">
+                <button
+                    type="button"
+                    class="btn btn-outline-dark w-100"
+                    onclick="showInventorySearch(); openBarcodeScanner();">
+                    <i class="bi bi-upc-scan"></i>
+                    اسکن بارکد
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section id="inventorySection" class="d-none">
+
+        <button
+            type="button"
+            class="btn btn-outline-dark w-100 mb-3"
+            onclick="showInventory()"
+            style="height:48px;border-radius:12px;">
+            <i class="bi bi-speedometer2"></i>
+            بازگشت به داشبورد
+        </button>
 
         <div class="search-box">
             <i class="bi bi-search"></i>
@@ -279,7 +585,178 @@ function showLoginMessage(message, type = "danger") {
 
 function showInventory() {
     document.getElementById("loginSection").classList.add("d-none");
+    document.getElementById("dashboardSection").classList.remove("d-none");
+    document.getElementById("inventorySection").classList.add("d-none");
+
+    loadDashboard();
+}
+
+
+function showInventorySearch() {
+    document.getElementById("dashboardSection").classList.add("d-none");
     document.getElementById("inventorySection").classList.remove("d-none");
+
+    const input = document.querySelector(".search-box input");
+
+    if (input) {
+        input.focus();
+    }
+}
+
+
+async function loadDashboard() {
+
+    const token =
+        localStorage.getItem("manshoor_mobile_token");
+
+    if (!token) {
+        location.reload();
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            API_BASE + "/api/v1/dashboard",
+            {
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.status === 401) {
+            localStorage.removeItem("manshoor_mobile_token");
+            location.reload();
+            return;
+        }
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || "دریافت داشبورد انجام نشد."
+            );
+        }
+
+        const stats = data.stats || {};
+
+        document.getElementById(
+            "dashboardTotalProducts"
+        ).textContent =
+            stats.total_products ?? 0;
+
+        document.getElementById(
+            "dashboardTotalQuantity"
+        ).textContent =
+            stats.total_quantity ?? 0;
+
+        document.getElementById(
+            "dashboardLowStock"
+        ).textContent =
+            stats.low_stock_count ?? 0;
+
+        document.getElementById(
+            "dashboardOutOfStock"
+        ).textContent =
+            stats.out_of_stock_count ?? 0;
+
+        document.getElementById(
+            "dashboardStockIn"
+        ).textContent =
+            stats.stock_in_30_days ?? 0;
+
+        document.getElementById(
+            "dashboardStockOut"
+        ).textContent =
+            stats.stock_out_30_days ?? 0;
+
+
+        // کالاهای کم موجودی
+        const lowStockProducts =
+            data.low_stock_products || [];
+
+        const lowStockList =
+            document.getElementById(
+                "dashboardLowStockList"
+            );
+
+        const lowStockBadge =
+            document.getElementById(
+                "dashboardLowStockBadge"
+            );
+
+        lowStockBadge.textContent =
+            lowStockProducts.length;
+
+        if (!lowStockProducts.length) {
+
+            lowStockList.innerHTML = `
+                <div class="alert alert-success mb-0">
+                    <i class="bi bi-check-circle"></i>
+                    همه کالاها موجودی مناسبی دارند.
+                </div>
+            `;
+
+        } else {
+
+            lowStockList.innerHTML =
+                lowStockProducts.map(product => `
+                    <div
+                        class="border rounded-3 p-3 mb-2"
+                        style="cursor:pointer;"
+                        onclick="openProduct(${product.id})">
+
+                        <div class="d-flex justify-content-between align-items-start">
+
+                            <strong>
+                                ${escapeHtml(product.name)}
+                            </strong>
+
+                            <span class="badge text-bg-warning">
+                                ${product.qty}
+                                ${escapeHtml(product.unit || "عدد")}
+                            </span>
+
+                        </div>
+
+                        <div class="small text-secondary mt-2">
+                            حداقل موجودی:
+                            ${product.min_qty}
+                            ${escapeHtml(product.unit || "عدد")}
+                        </div>
+
+                        ${
+                            product.barcode
+                                ? `
+                                    <div class="small text-secondary mt-1">
+                                        بارکد:
+                                        ${escapeHtml(product.barcode)}
+                                    </div>
+                                  `
+                                : ""
+                        }
+
+                    </div>
+                `).join("");
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Dashboard error:",
+            error
+        );
+
+        document.getElementById(
+            "dashboardLowStockList"
+        ).innerHTML = `
+            <div class="alert alert-danger mb-0">
+                دریافت اطلاعات داشبورد انجام نشد.
+            </div>
+        `;
+
+    }
 }
 
 
@@ -443,9 +920,29 @@ async function searchProducts(query) {
 
 
 let barcodeScanner = null;
+let serialScannerTarget = null;
 
 
-async function openBarcodeScanner() {
+async function openSerialScanner(button) {
+
+    const inputGroup = button.closest(".input-group");
+
+    if (!inputGroup) {
+        return;
+    }
+
+    serialScannerTarget =
+        inputGroup.querySelector(".stock-in-serial");
+
+    if (!serialScannerTarget) {
+        return;
+    }
+
+    await openBarcodeScanner("serial");
+}
+
+
+async function openBarcodeScanner(mode = "search") {
 
     const container =
         document.getElementById("barcodeScanner");
@@ -511,6 +1008,22 @@ async function openBarcodeScanner() {
 
                 container.classList.add("d-none");
 
+                if (
+                    mode === "serial" &&
+                    serialScannerTarget
+                ) {
+                    serialScannerTarget.value = barcode;
+                    serialScannerTarget.dispatchEvent(
+                        new Event("input", { bubbles: true })
+                    );
+
+                    serialScannerTarget.focus();
+
+                    serialScannerTarget = null;
+
+                    return;
+                }
+
                 const input =
                     document.querySelector(
                         ".search-box input"
@@ -537,12 +1050,62 @@ async function openBarcodeScanner() {
 
         barcodeScanner = null;
 
+        let errorMessage =
+            "دسترسی به دوربین امکان‌پذیر نیست.";
+
+        if (!window.isSecureContext) {
+            errorMessage =
+                "برای استفاده از دوربین باید با HTTPS وارد شوید.";
+
+        } else if (
+            !navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia
+        ) {
+            errorMessage =
+                "مرورگر فعلی از دسترسی به دوربین پشتیبانی نمی‌کند.";
+
+        } else if (
+            error &&
+            error.name === "NotAllowedError"
+        ) {
+            errorMessage =
+                "اجازه دسترسی به دوربین داده نشده است. مجوز Camera مرورگر را فعال کنید.";
+
+        } else if (
+            error &&
+            error.name === "NotFoundError"
+        ) {
+            errorMessage =
+                "هیچ دوربینی در این دستگاه پیدا نشد.";
+
+        } else if (
+            error &&
+            error.name === "NotReadableError"
+        ) {
+            errorMessage =
+                "دوربین توسط برنامه دیگری در حال استفاده است.";
+
+        } else if (
+            error &&
+            error.name === "SecurityError"
+        ) {
+            errorMessage =
+                "مرورگر دسترسی به دوربین را به دلیل تنظیمات امنیتی مسدود کرده است.";
+
+        } else if (
+            error &&
+            error.name === "OverconstrainedError"
+        ) {
+            errorMessage =
+                "دوربین انتخاب‌شده قابل استفاده نیست. دوباره تلاش کنید.";
+        }
+
         if (message) {
             message.className =
                 "alert alert-danger";
 
             message.textContent =
-                "دسترسی به دوربین امکان‌پذیر نیست.";
+                errorMessage;
 
             message.classList.remove("d-none");
         }
@@ -980,10 +1543,6 @@ async function openProduct(productId) {
 
                     ${serialsHtml}
 
-                    ${movementsHtml}
-
-                </div>
-
                 <div class="row g-2 mt-3">
 
                     <div class="col-6">
@@ -1021,6 +1580,7 @@ async function openProduct(productId) {
 
                 </div>
 
+
                 <div id="stockInForm" class="d-none mt-3">
 
                     <div class="border rounded-3 p-3 text-end">
@@ -1030,7 +1590,7 @@ async function openProduct(productId) {
                             ورود کالا
                         </h5>
 
-                        <div class="mb-3">
+                        <div class="dashboard-header">
                             <label class="form-label">
                                 تعداد
                             </label>
@@ -1183,6 +1743,11 @@ async function openProduct(productId) {
 
                 </div>
 
+
+                    ${movementsHtml}
+
+                </div>
+
             </div>
         `;
 
@@ -1255,11 +1820,20 @@ function updateStockInSerials() {
 
         list.innerHTML += `
             <div class="mb-2">
-                <input
-                    type="text"
-                    class="form-control stock-in-serial"
-                    placeholder="سریال ${i}"
-                    style="height:48px;direction:ltr;text-align:left;">
+                <div class="input-group">
+                    <input
+                        type="text"
+                        class="form-control stock-in-serial"
+                        placeholder="سریال ${i}"
+                        style="height:48px;direction:ltr;text-align:left;">
+                    <button
+                        type="button"
+                        class="btn btn-dark"
+                        onclick="openSerialScanner(this)"
+                        style="min-width:52px;">
+                        <i class="bi bi-upc-scan"></i>
+                    </button>
+                </div>
             </div>
         `;
     }

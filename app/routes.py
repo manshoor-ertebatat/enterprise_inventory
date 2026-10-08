@@ -3151,10 +3151,18 @@ def api_mobile_products(user):
     query = Product.query.filter_by(is_active=True)
 
     if q:
+        serial_product_ids = db.session.query(
+            ProductSerial.product_id
+        ).filter(
+            ProductSerial.serial_number.ilike(f"%{q}%"),
+            ProductSerial.status == "IN_STOCK"
+        )
+
         query = query.filter(
             db.or_(
                 Product.name.ilike(f"%{q}%"),
-                Product.barcode.ilike(f"%{q}%")
+                Product.barcode.ilike(f"%{q}%"),
+                Product.id.in_(serial_product_ids)
             )
         )
 
@@ -3295,6 +3303,120 @@ def api_mobile_product_movements(user, product_id):
                 )
             }
             for movement in movements
+        ]
+    })
+
+
+@bp.route("/api/v1/dashboard", methods=["GET"])
+@api_auth_required
+def api_mobile_dashboard(user):
+    from datetime import datetime, timedelta
+
+    # آمار کلی کالاها
+    active_products = Product.query.filter_by(
+        is_active=True
+    ).all()
+
+    total_products = len(active_products)
+    total_quantity = sum(
+        product.qty or 0
+        for product in active_products
+    )
+
+    low_stock_products = [
+        product
+        for product in active_products
+        if (product.qty or 0) <= (product.min_qty or 0)
+    ]
+
+    out_of_stock_count = sum(
+        1
+        for product in active_products
+        if (product.qty or 0) <= 0
+    )
+
+    # ورود و خروج ۳۰ روز اخیر
+    since = datetime.utcnow() - timedelta(days=30)
+
+    recent_movements_30 = Movement.query.filter(
+        Movement.timestamp >= since
+    ).all()
+
+    stock_in_30_days = sum(
+        movement.qty or 0
+        for movement in recent_movements_30
+        if movement.type == "IN"
+    )
+
+    stock_out_30_days = sum(
+        movement.qty or 0
+        for movement in recent_movements_30
+        if movement.type == "OUT"
+    )
+
+    # آخرین گردش‌های انبار
+    recent_movements = Movement.query.order_by(
+        Movement.timestamp.desc(),
+        Movement.id.desc()
+    ).limit(10).all()
+
+    product_map = {
+        product.id: product
+        for product in active_products
+    }
+
+    return jsonify({
+        "success": True,
+
+        "stats": {
+            "total_products": total_products,
+            "total_quantity": total_quantity,
+            "low_stock_count": len(low_stock_products),
+            "out_of_stock_count": out_of_stock_count,
+            "stock_in_30_days": stock_in_30_days,
+            "stock_out_30_days": stock_out_30_days
+        },
+
+        "low_stock_products": [
+            {
+                "id": product.id,
+                "name": product.name,
+                "barcode": product.barcode or "",
+                "qty": product.qty or 0,
+                "min_qty": product.min_qty or 0,
+                "unit": product.unit or ""
+            }
+            for product in sorted(
+                low_stock_products,
+                key=lambda item: (item.qty or 0)
+            )[:20]
+        ],
+
+        "recent_movements": [
+            {
+                "id": movement.id,
+                "product_id": movement.product_id,
+                "product_name": (
+                    product_map[movement.product_id].name
+                    if movement.product_id in product_map
+                    else "کالای حذف‌شده"
+                ),
+                "type": movement.type,
+                "qty": movement.qty or 0,
+                "receiver_name": movement.receiver_name or "",
+                "customer_name": movement.customer_name or "",
+                "project_name": movement.project_name or "",
+                "description": movement.description or "",
+                "created_by": movement.created_by or "",
+                "timestamp": (
+                    movement.timestamp.strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    )
+                    if movement.timestamp
+                    else None
+                )
+            }
+            for movement in recent_movements
         ]
     })
 
